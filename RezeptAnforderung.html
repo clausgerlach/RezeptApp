@@ -368,7 +368,10 @@
         <div class="field"><label>PLZ *</label><input type="text" id="ed-plz" inputmode="numeric"></div>
         <div class="field"><label>Ort *</label><input type="text" id="ed-ort"></div>
       </div>
-      <div class="field"><label>Telefon</label><input type="tel" id="ed-telefon"></div>
+      <div class="field-row">
+        <div class="field"><label>Telefon-Vorwahl</label><input type="tel" id="ed-tel-vorwahl" placeholder="z.B. 09747"></div>
+        <div class="field"><label>Telefon-Nummer</label><input type="tel" id="ed-tel-nummer" placeholder="z.B. 1234"></div>
+      </div>
       <div class="field"><label>E-Mail *</label><input type="email" id="ed-email" autocapitalize="off"></div>
     </div>
 
@@ -433,7 +436,8 @@
           <div class="field"><label>Straße</label><input type="text" id="cfg-f-strasse" autocapitalize="off"></div>
           <div class="field"><label>PLZ</label><input type="text" id="cfg-f-plz" autocapitalize="off"></div>
           <div class="field"><label>Ort</label><input type="text" id="cfg-f-ort" autocapitalize="off"></div>
-          <div class="field"><label>Telefon</label><input type="text" id="cfg-f-telefon" autocapitalize="off"></div>
+          <div class="field"><label>Tel.-Vorwahl</label><input type="text" id="cfg-f-telvorwahl" autocapitalize="off"></div>
+          <div class="field"><label>Tel.-Nummer</label><input type="text" id="cfg-f-telnummer" autocapitalize="off"></div>
           <div class="field"><label>E-Mail</label><input type="text" id="cfg-f-email" autocapitalize="off"></div>
         </div>
       </div>
@@ -513,19 +517,23 @@
 const DEFAULTS = {
   formAction: "https://www.gesundheitszentrum-schondra.de/formulare/index.php?form_id=10002336",
   fieldNames: {
-    datum: "datum",
-    vorname: "vorname",
-    nachname: "nachname",
-    geburtsdatum: "geburtsdatum",
-    strasse: "strasse",
-    plz: "plz",
-    ort: "ort",
-    telefon: "telefon",
-    email: "email",
-    medikamente: ["medikament_1","medikament_2","medikament_3","medikament_4","medikament_5","medikament_6"]
+    datum: "formgen_1237927",
+    vorname: "formgen_1237928",
+    nachname: "formgen_1237929",
+    geburtsdatum: "formgen_1237930",
+    strasse: "formgen_1237931",
+    plz: "formgen_1237932",
+    ort: "formgen_1237933",
+    telefon_vorwahl: "formgen_1237934[vorwahl]",
+    telefon_nummer: "formgen_1237934[nummer]",
+    email: "formgen_1237935",
+    medikamente: [
+      "formgen_1237936","formgen_1237937","formgen_1237938",
+      "formgen_1237939","formgen_1237940","formgen_1237941"
+    ]
   },
-  honeypot: "",
-  extraHidden: "" // "name=value" pro Zeile
+  honeypot: "formgen_captcha_email",
+  extraHidden: "multiple-required="
 };
 
 // ============================================================
@@ -635,11 +643,32 @@ function setEditFields(p) {
   document.getElementById("ed-strasse").value = p.strasse || "";
   document.getElementById("ed-plz").value = p.plz || "";
   document.getElementById("ed-ort").value = p.ort || "";
-  document.getElementById("ed-telefon").value = p.telefon || "";
+  // Telefon: Migration von altem Single-Feld in Vorwahl/Nummer
+  let tv = p.telefon_vorwahl, tn = p.telefon_nummer;
+  if (tv === undefined && tn === undefined && p.telefon) {
+    const split = splitPhone(p.telefon);
+    tv = split.vorwahl;
+    tn = split.nummer;
+  }
+  document.getElementById("ed-tel-vorwahl").value = tv || "";
+  document.getElementById("ed-tel-nummer").value = tn || "";
   document.getElementById("ed-email").value = p.email || "";
   state.editingPerson = JSON.parse(JSON.stringify(p));
   if (!state.editingPerson.katalog) state.editingPerson.katalog = [];
   renderEditCatalog();
+}
+function splitPhone(s) {
+  // Versucht Vorwahl/Nummer aus einem zusammenhängenden Telefon-String zu trennen
+  if (!s) return { vorwahl: "", nummer: "" };
+  s = s.trim();
+  // Bekannte Trenner: Leerzeichen, /, -, Klammern
+  const m = s.match(/^\(?(\+?\d[\d\s]{0,5}\d|0\d{1,4})\)?[\s\-\/]+(.+)$/);
+  if (m) return { vorwahl: m[1].replace(/\s+/g,""), nummer: m[2].trim() };
+  // Kein Trenner: Heuristik - 4-5 Zeichen am Anfang als Vorwahl
+  if (s.startsWith("0") && s.length > 5) {
+    return { vorwahl: s.slice(0, 5), nummer: s.slice(5) };
+  }
+  return { vorwahl: "", nummer: s };
 }
 function renderEditCatalog() {
   const list = document.getElementById("ed-med-list");
@@ -678,7 +707,9 @@ function savePerson() {
   p.strasse = document.getElementById("ed-strasse").value.trim();
   p.plz = document.getElementById("ed-plz").value.trim();
   p.ort = document.getElementById("ed-ort").value.trim();
-  p.telefon = document.getElementById("ed-telefon").value.trim();
+  p.telefon_vorwahl = document.getElementById("ed-tel-vorwahl").value.trim();
+  p.telefon_nummer = document.getElementById("ed-tel-nummer").value.trim();
+  delete p.telefon; // alten Single-Feld-Wert nach Migration entfernen
   p.email = document.getElementById("ed-email").value.trim();
 
   if (!p.vorname || !p.nachname || !p.email) {
@@ -719,7 +750,8 @@ function duplicateAsTemplate() {
     strasse: document.getElementById("ed-strasse").value.trim(),
     plz: document.getElementById("ed-plz").value.trim(),
     ort: document.getElementById("ed-ort").value.trim(),
-    telefon: document.getElementById("ed-telefon").value.trim(),
+    telefon_vorwahl: document.getElementById("ed-tel-vorwahl").value.trim(),
+    telefon_nummer: document.getElementById("ed-tel-nummer").value.trim(),
     email: document.getElementById("ed-email").value.trim(),
     katalog: []
   };
@@ -756,11 +788,12 @@ function renderStammSummary(p) {
   } else {
     status.textContent = "vollständig"; status.classList.remove("badge-warn");
   }
+  const tel = [p.telefon_vorwahl, p.telefon_nummer].filter(Boolean).join(" ").trim() || p.telefon || "—";
   summary.innerHTML = `
     <div>${escapeHtml(p.vorname)} ${escapeHtml(p.nachname)}, geb. ${formatDateDE(p.geburtsdatum)}</div>
     <div>${escapeHtml(p.strasse || "")}</div>
     <div>${escapeHtml(p.plz || "")} ${escapeHtml(p.ort || "")}</div>
-    <div>${escapeHtml(p.telefon || "—")} · ${escapeHtml(p.email || "")}</div>`;
+    <div>${escapeHtml(tel)} · ${escapeHtml(p.email || "")}</div>`;
 }
 function renderRequestMedList() {
   const p = state.persons.find(x => x.id === state.activePersonId);
@@ -841,14 +874,26 @@ function buildFormData() {
 
   const data = {};
   const datumIso = document.getElementById("req-datum")?.value || tomorrowISO();
-  if (fn.datum)         data[fn.datum] = formatDateDE(datumIso);
+
+  // Datums-Felder im ISO-Format (type=date erwartet YYYY-MM-DD)
+  if (fn.datum)         data[fn.datum] = datumIso;
+  if (fn.geburtsdatum)  data[fn.geburtsdatum] = p.geburtsdatum || "";
+
   if (fn.vorname)       data[fn.vorname] = p.vorname;
   if (fn.nachname)      data[fn.nachname] = p.nachname;
-  if (fn.geburtsdatum)  data[fn.geburtsdatum] = formatDateDE(p.geburtsdatum);
   if (fn.strasse)       data[fn.strasse] = p.strasse;
   if (fn.plz)           data[fn.plz] = p.plz;
   if (fn.ort)           data[fn.ort] = p.ort;
-  if (fn.telefon)       data[fn.telefon] = p.telefon;
+
+  // Telefon: aufgeteilt in Vorwahl und Nummer
+  if (fn.telefon_vorwahl) data[fn.telefon_vorwahl] = p.telefon_vorwahl || "";
+  if (fn.telefon_nummer)  data[fn.telefon_nummer] = p.telefon_nummer || "";
+  // Falls die alte Single-Field-Variante noch konfiguriert ist
+  if (fn.telefon) {
+    const tel = [p.telefon_vorwahl, p.telefon_nummer].filter(Boolean).join(" ").trim() || p.telefon || "";
+    data[fn.telefon] = tel;
+  }
+
   if (fn.email)         data[fn.email] = p.email;
   (fn.medikamente || []).forEach((name, i) => {
     if (name) data[name] = meds[i] || "";
@@ -857,14 +902,17 @@ function buildFormData() {
   // Honeypot — explicitly empty
   if (cfg.honeypot) data[cfg.honeypot] = "";
 
-  // Extra hidden fields (name=value, eine pro Zeile)
+  // Extra hidden fields (name=value, eine pro Zeile, leerer Wert erlaubt)
   if (cfg.extraHidden) {
     cfg.extraHidden.split("\n").forEach(line => {
       const idx = line.indexOf("=");
-      if (idx > 0) {
+      if (idx >= 0) {
         const k = line.slice(0, idx).trim();
         const v = line.slice(idx + 1).trim();
         if (k) data[k] = v;
+      } else if (line.trim()) {
+        // Zeile ohne "=" → als leeres Feld behandeln
+        data[line.trim()] = "";
       }
     });
   }
@@ -914,7 +962,8 @@ function renderSettings() {
   document.getElementById("cfg-f-strasse").value = c.fieldNames.strasse || "";
   document.getElementById("cfg-f-plz").value = c.fieldNames.plz || "";
   document.getElementById("cfg-f-ort").value = c.fieldNames.ort || "";
-  document.getElementById("cfg-f-telefon").value = c.fieldNames.telefon || "";
+  document.getElementById("cfg-f-telvorwahl").value = c.fieldNames.telefon_vorwahl || "";
+  document.getElementById("cfg-f-telnummer").value = c.fieldNames.telefon_nummer || "";
   document.getElementById("cfg-f-email").value = c.fieldNames.email || "";
   for (let i = 0; i < 6; i++) {
     document.getElementById("cfg-f-med-" + i).value = c.fieldNames.medikamente?.[i] || "";
@@ -937,7 +986,8 @@ function saveConfig() {
       strasse: document.getElementById("cfg-f-strasse").value.trim(),
       plz: document.getElementById("cfg-f-plz").value.trim(),
       ort: document.getElementById("cfg-f-ort").value.trim(),
-      telefon: document.getElementById("cfg-f-telefon").value.trim(),
+      telefon_vorwahl: document.getElementById("cfg-f-telvorwahl").value.trim(),
+      telefon_nummer: document.getElementById("cfg-f-telnummer").value.trim(),
       email: document.getElementById("cfg-f-email").value.trim(),
       medikamente: meds
     },
