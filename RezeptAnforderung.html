@@ -301,6 +301,14 @@
     </div>
 
     <div class="section">
+      <h3>Datum der Abholung</h3>
+      <div class="section-hint">Standard: morgen. Bei Bedarf anpassen.</div>
+      <div class="field" style="margin-bottom: 0;">
+        <input type="date" id="req-datum">
+      </div>
+    </div>
+
+    <div class="section">
       <h3>Stammdaten <span class="badge" id="stamm-status">vollständig</span></h3>
       <div id="stamm-summary" style="font-size:14px; color: var(--ink-soft); line-height:1.6;"></div>
       <div class="btn-row">
@@ -724,6 +732,7 @@ function openRequest(personId) {
   state.selectedMeds = [];
   state.adHocMeds = [];
   document.getElementById("request-title").textContent = p.displayName;
+  document.getElementById("req-datum").value = tomorrowISO();
   renderStammSummary(p);
   renderRequestMedList();
   renderAdHoc();
@@ -824,7 +833,8 @@ function buildFormData() {
   ].slice(0, 6);
 
   const data = {};
-  if (fn.datum)         data[fn.datum] = formatDateDE(new Date().toISOString().slice(0,10));
+  const datumIso = document.getElementById("req-datum")?.value || tomorrowISO();
+  if (fn.datum)         data[fn.datum] = formatDateDE(datumIso);
   if (fn.vorname)       data[fn.vorname] = p.vorname;
   if (fn.nachname)      data[fn.nachname] = p.nachname;
   if (fn.geburtsdatum)  data[fn.geburtsdatum] = formatDateDE(p.geburtsdatum);
@@ -1021,6 +1031,15 @@ function formatDateDE(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
   if (m) return `${m[3]}.${m[2]}.${m[1]}`;
   return iso;
+}
+function tomorrowISO() {
+  // Liefert YYYY-MM-DD von morgen, lokale Zeitzone (kein UTC-Versatz)
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 // ============================================================
