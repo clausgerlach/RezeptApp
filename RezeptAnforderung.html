@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rezept">
+<meta name="theme-color" content="#faf7f2">
+<title>Rezeptanforderung</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%233a5f3f'/><text x='90' y='118' font-family='Georgia,serif' font-size='100' font-weight='600' text-anchor='middle' fill='%23faf7f2'>R</text></svg>">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --bg-soft: #f3eee5;
+    --bg-card: #ffffff;
+    --ink: #2d2520;
+    --ink-soft: #6a5d4f;
+    --ink-faint: #a89c8b;
+    --rule: #e6dfd2;
+    --accent: #3a5f3f;
+    --accent-soft: #4a7a52;
+    --accent-bg: #ecf2ed;
+    --warning: #a14a1c;
+    --danger: #8b2c2c;
+    --shadow: 0 1px 2px rgba(45,37,32,.04), 0 4px 12px rgba(45,37,32,.06);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    min-height: 100vh;
+  }
+  .serif { font-family: "Iowan Old Style", "Palatino", "Georgia", serif; }
+  .app { max-width: 540px; margin: 0 auto; padding: 0 18px 80px; }
+
+/* Header */
+header.top {
+padding: 22px 0 12px;
+display: flex; align-items: center; justify-content: space-between;
+}
+header.top h1 {
+font-family: “Iowan Old Style”, “Palatino”, “Georgia”, serif;
+font-size: 26px; font-weight: 600; margin: 0; letter-spacing: -0.01em;
+}
+header.top h1 small {
+display: block; font-size: 13px; color: var(–ink-soft);
+font-style: italic; font-weight: 400; margin-top: 2px;
+}
+.icon-btn {
+width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(–rule);
+background: var(–bg-card); display: inline-flex; align-items: center; justify-content: center;
+cursor: pointer; padding: 0; color: var(–ink-soft);
+}
+.icon-btn:active { background: var(–bg-soft); }
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Person cards */
+.person-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.person-card {
+background: var(–bg-card); border-radius: var(–radius);
+padding: 16px 18px; box-shadow: var(–shadow);
+display: flex; align-items: center; gap: 14px;
+cursor: pointer; border: 1px solid transparent;
+transition: border-color .15s;
+}
+.person-card:active { border-color: var(–accent); }
+.person-avatar {
+width: 44px; height: 44px; border-radius: 50%;
+background: var(–accent-bg); color: var(–accent);
+display: flex; align-items: center; justify-content: center;
+font-family: “Iowan Old Style”, serif; font-size: 19px; font-weight: 600;
+flex-shrink: 0;
+}
+.person-info { flex: 1; min-width: 0; }
+.person-name { font-weight: 600; font-size: 17px; }
+.person-sub { font-size: 13px; color: var(–ink-soft); margin-top: 2px;
+overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chevron { color: var(–ink-faint); }
+
+.empty {
+text-align: center; padding: 50px 20px; color: var(–ink-soft);
+border: 1px dashed var(–rule); border-radius: var(–radius); margin-top: 16px;
+}
+.empty .serif { font-size: 22px; color: var(–ink); margin-bottom: 6px; display: block; }
+
+/* Buttons */
+.btn {
+display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+padding: 14px 20px; border-radius: var(–radius-sm);
+font-size: 16px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+font-family: inherit;
+}
+.btn-primary {
+background: var(–accent); color: var(–bg);
+box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+.btn-primary:active { background: var(–accent-soft); }
+.btn-primary:disabled { background: var(–ink-faint); cursor: not-allowed; }
+.btn-secondary {
+background: var(–bg-card); color: var(–ink);
+border-color: var(–rule);
+}
+.btn-secondary:active { background: var(–bg-soft); }
+.btn-danger { color: var(–danger); background: var(–bg-card); border-color: var(–rule); }
+.btn-block { width: 100%; }
+.btn-row { display: flex; gap: 10px; margin-top: 14px; }
+.btn-row .btn { flex: 1; }
+
+/* Page nav */
+.page-nav {
+display: flex; align-items: center; gap: 10px; padding: 14px 0 6px;
+}
+.page-nav .back {
+color: var(–accent); cursor: pointer; font-size: 16px;
+display: inline-flex; align-items: center; gap: 4px;
+margin-left: -4px;
+}
+.page-nav h2 {
+font-family: “Iowan Old Style”, serif; font-size: 22px; font-weight: 600;
+margin: 0; flex: 1; text-align: center; padding-right: 60px;
+}
+
+/* Forms */
+.field { margin-bottom: 14px; }
+.field label {
+display: block; font-size: 13px; color: var(–ink-soft);
+margin-bottom: 4px; font-weight: 500;
+}
+.field input, .field textarea, .field select {
+width: 100%; padding: 12px 14px;
+border: 1px solid var(–rule); border-radius: var(–radius-sm);
+background: var(–bg-card); font-family: inherit; font-size: 16px;
+color: var(–ink);
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+outline: none; border-color: var(–accent);
+}
+.field-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+.field-row-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Sections */
+.section {
+background: var(–bg-card); border-radius: var(–radius);
+padding: 18px; margin-top: 14px; box-shadow: var(–shadow);
+}
+.section h3 {
+font-family: “Iowan Old Style”, serif; font-size: 17px; font-weight: 600;
+margin: 0 0 14px; display: flex; align-items: center; justify-content: space-between;
+}
+.section-hint { font-size: 13px; color: var(–ink-soft); margin: -8px 0 14px; }
+
+/* Medikament list */
+.med-list { display: flex; flex-direction: column; gap: 8px; }
+.med-row {
+display: flex; align-items: center; gap: 10px;
+padding: 12px 14px; background: var(–bg-soft); border-radius: var(–radius-sm);
+border: 1px solid transparent; cursor: pointer;
+transition: all .15s;
+}
+.med-row.selected {
+background: var(–accent-bg); border-color: var(–accent);
+}
+.med-row .checkbox {
+width: 22px; height: 22px; border: 2px solid var(–ink-faint);
+border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+background: var(–bg-card);
+}
+.med-row.selected .checkbox {
+background: var(–accent); border-color: var(–accent);
+}
+.med-row.selected .checkbox::after {
+content: “”; width: 11px; height: 6px;
+border-left: 2px solid var(–bg); border-bottom: 2px solid var(–bg);
+transform: rotate(-45deg) translate(1px,-1px);
+}
+.med-name { flex: 1; font-size: 15px; }
+.med-row .del {
+color: var(–ink-faint); padding: 4px 8px;
+margin-left: auto; cursor: pointer; font-size: 18px;
+}
+.med-input-row { display: flex; gap: 8px; margin-top: 10px; }
+.med-input-row input { flex: 1; }
+.med-input-row .btn { padding: 12px 16px; }
+
+.badge {
+display: inline-block; background: var(–accent-bg); color: var(–accent);
+padding: 2px 9px; border-radius: 10px; font-size: 12px; font-weight: 600;
+}
+.badge-warn { background: #fcefe2; color: var(–warning); }
+
+/* Submit area */
+.submit-bar {
+position: sticky; bottom: 0;
+background: linear-gradient(to bottom, transparent, var(–bg) 30%);
+padding: 30px 0 calc(env(safe-area-inset-bottom) + 12px);
+margin: 20px -18px -80px;
+padding-left: 18px; padding-right: 18px;
+}
+.selection-count {
+text-align: center; font-size: 13px; color: var(–ink-soft);
+margin-bottom: 8px;
+}
+
+/* Modal */
+.modal-bg {
+position: fixed; inset: 0; background: rgba(45,37,32,.55);
+display: none; align-items: center; justify-content: center;
+z-index: 100; padding: 20px;
+}
+.modal-bg.show { display: flex; }
+.modal {
+background: var(–bg); border-radius: var(–radius);
+max-width: 460px; width: 100%; padding: 22px;
+max-height: 90vh; overflow-y: auto;
+}
+.modal h3 {
+font-family: “Iowan Old Style”, serif; font-size: 19px; font-weight: 600;
+margin: 0 0 12px;
+}
+.modal-text { font-size: 14px; color: var(–ink-soft); margin-bottom: 16px; }
+
+/* Toast */
+.toast {
+position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 50%;
+transform: translateX(-50%) translateY(100px);
+background: var(–ink); color: var(–bg);
+padding: 12px 20px; border-radius: var(–radius-sm);
+font-size: 14px; opacity: 0; transition: all .25s;
+pointer-events: none; z-index: 200; max-width: 90%;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.error { background: var(–danger); }
+
+/* Settings panel */
+.settings-group { margin-bottom: 22px; }
+.settings-group h4 {
+font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+color: var(–ink-soft); margin: 0 0 8px; font-weight: 600;
+}
+.mapping-grid {
+display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.file-input-wrap {
+position: relative; overflow: hidden; display: inline-flex;
+}
+.file-input-wrap input[type=file] {
+position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+
+details summary {
+cursor: pointer; padding: 8px 0; font-size: 14px;
+color: var(–ink-soft); user-select: none;
+}
+details[open] summary { color: var(–ink); }
+pre {
+background: var(–bg-soft); padding: 12px; border-radius: var(–radius-sm);
+font-size: 12px; overflow-x: auto;
+font-family: “SF Mono”, “Menlo”, monospace;
+}
+</style>
+
+</head>
+<body>
+<div class="app">
+
+  <!-- ========== PAGE: HOME (Personenliste) ========== -->
+
+  <div id="page-home" class="page active">
+    <header class="top">
+      <h1 class="serif">Rezeptanforderung<small>Praxis Conze / Belic, Schondra</small></h1>
+      <button class="icon-btn" onclick="goto('settings')" aria-label="Einstellungen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </header>
+
+```
+<div id="person-list" class="person-list"></div>
+
+<div style="margin-top: 16px;">
+  <button class="btn btn-secondary btn-block" onclick="newPerson()">
+    <span style="font-size:18px;">+</span> Person hinzufügen
+  </button>
+</div>
+```
+
+  </div>
+
+  <!-- ========== PAGE: ANFORDERN ========== -->
+
+  <div id="page-request" class="page">
+    <div class="page-nav">
+      <span class="back" onclick="goto('home')">‹ Zurück</span>
+      <h2 class="serif" id="request-title">—</h2>
+    </div>
+
+```
+<div class="section">
+  <h3>Stammdaten <span class="badge" id="stamm-status">vollständig</span></h3>
+  <div id="stamm-summary" style="font-size:14px; color: var(--ink-soft); line-height:1.6;"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="editPerson(state.activePersonId)">Bearbeiten</button>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Medikamente <span id="sel-count" class="badge">0/6</span></h3>
+  <div class="section-hint">Bis zu 6 Medikamente auswählen</div>
+  <div id="med-list-request" class="med-list"></div>
+
+  <details style="margin-top:14px;">
+    <summary>Einmaliges Medikament hinzufügen (nicht im Katalog speichern)</summary>
+    <div class="med-input-row">
+      <input type="text" id="ad-hoc-med" placeholder="Medikament-Name + Stärke">
+      <button class="btn btn-secondary" onclick="addAdHocMed()">Hinzu</button>
+    </div>
+    <div id="ad-hoc-list" style="margin-top:10px;"></div>
+  </details>
+</div>
+
+<div class="submit-bar">
+  <div class="selection-count" id="sub-count">0 Medikamente ausgewählt</div>
+  <button class="btn btn-primary btn-block" id="submit-btn" onclick="submitRequest()" disabled>
+    Rezept anfordern
+  </button>
+  <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="previewRequest()">
+    Vorschau (was wird gesendet?)
+  </button>
+</div>
+```
+
+  </div>
+
+  <!-- ========== PAGE: PERSON BEARBEITEN ========== -->
+
+  <div id="page-edit" class="page">
+    <div class="page-nav">
+      <span class="back" onclick="goto('home')">‹ Zurück</span>
+      <h2 class="serif">Person</h2>
+    </div>
+
+```
+<div class="section">
+  <h3>Anzeigename</h3>
+  <div class="field">
+    <input type="text" id="ed-displayname" placeholder='z.B. "Ich" oder "Mutter"'>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Stammdaten</h3>
+  <div class="field-row-3">
+    <div class="field"><label>Vorname *</label><input type="text" id="ed-vorname"></div>
+    <div class="field"><label>Nachname *</label><input type="text" id="ed-nachname"></div>
+  </div>
+  <div class="field"><label>Geburtsdatum *</label><input type="date" id="ed-geburtsdatum"></div>
+  <div class="field"><label>Straße + Hausnr. *</label><input type="text" id="ed-strasse"></div>
+  <div class="field-row">
+    <div class="field"><label>PLZ *</label><input type="text" id="ed-plz" inputmode="numeric"></div>
+    <div class="field"><label>Ort *</label><input type="text" id="ed-ort"></div>
+  </div>
+  <div class="field"><label>Telefon</label><input type="tel" id="ed-telefon"></div>
+  <div class="field"><label>E-Mail *</label><input type="email" id="ed-email" autocapitalize="off"></div>
+</div>
+
+<div class="section">
+  <h3>Medikamenten-Katalog</h3>
+  <div class="section-hint">Häufig benötigte Medikamente — werden bei der Anforderung zur Auswahl angeboten.</div>
+  <div id="ed-med-list" class="med-list"></div>
+  <div class="med-input-row">
+    <input type="text" id="ed-new-med" placeholder='z.B. "Metformin 1000 mg, N3"'>
+    <button class="btn btn-secondary" onclick="addCatalogMed()">Hinzu</button>
+  </div>
+</div>
+
+<div class="btn-row" style="margin-top: 20px;">
+  <button class="btn btn-primary" onclick="savePerson()">Speichern</button>
+  <button class="btn btn-danger" onclick="deletePerson()">Löschen</button>
+</div>
+```
+
+  </div>
+
+  <!-- ========== PAGE: SETTINGS ========== -->
+
+  <div id="page-settings" class="page">
+    <div class="page-nav">
+      <span class="back" onclick="goto('home')">‹ Zurück</span>
+      <h2 class="serif">Einstellungen</h2>
+    </div>
+
+```
+<div class="section">
+  <h3>Daten-Backup</h3>
+  <div class="section-hint">Da iOS die lokalen Daten gelegentlich löschen kann, regelmäßig sichern.</div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="exportData()">Export (JSON)</button>
+    <button class="btn btn-secondary file-input-wrap">
+      Import
+      <input type="file" accept="application/json" onchange="importData(event)">
+    </button>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Formular-Konfiguration</h3>
+  <div class="section-hint">
+    Diese Werte musst du <em>einmal</em> einrichten. Anleitung am Ende der Seite.
+  </div>
+  <div class="settings-group">
+    <h4>Form-URL</h4>
+    <div class="field">
+      <input type="url" id="cfg-action" autocapitalize="off">
+    </div>
+  </div>
+  <div class="settings-group">
+    <h4>Feldname-Zuordnung</h4>
+    <div class="mapping-grid">
+      <div class="field"><label>Datum</label><input type="text" id="cfg-f-datum" autocapitalize="off"></div>
+      <div class="field"><label>Vorname</label><input type="text" id="cfg-f-vorname" autocapitalize="off"></div>
+      <div class="field"><label>Nachname</label><input type="text" id="cfg-f-nachname" autocapitalize="off"></div>
+      <div class="field"><label>Geburtsdatum</label><input type="text" id="cfg-f-geburtsdatum" autocapitalize="off"></div>
+      <div class="field"><label>Straße</label><input type="text" id="cfg-f-strasse" autocapitalize="off"></div>
+      <div class="field"><label>PLZ</label><input type="text" id="cfg-f-plz" autocapitalize="off"></div>
+      <div class="field"><label>Ort</label><input type="text" id="cfg-f-ort" autocapitalize="off"></div>
+      <div class="field"><label>Telefon</label><input type="text" id="cfg-f-telefon" autocapitalize="off"></div>
+      <div class="field"><label>E-Mail</label><input type="text" id="cfg-f-email" autocapitalize="off"></div>
+    </div>
+  </div>
+  <div class="settings-group">
+    <h4>Medikament-Felder (1 bis 6)</h4>
+    <div class="mapping-grid">
+      <div class="field"><label>Med 1</label><input type="text" id="cfg-f-med-0" autocapitalize="off"></div>
+      <div class="field"><label>Med 2</label><input type="text" id="cfg-f-med-1" autocapitalize="off"></div>
+      <div class="field"><label>Med 3</label><input type="text" id="cfg-f-med-2" autocapitalize="off"></div>
+      <div class="field"><label>Med 4</label><input type="text" id="cfg-f-med-3" autocapitalize="off"></div>
+      <div class="field"><label>Med 5</label><input type="text" id="cfg-f-med-4" autocapitalize="off"></div>
+      <div class="field"><label>Med 6</label><input type="text" id="cfg-f-med-5" autocapitalize="off"></div>
+    </div>
+  </div>
+  <div class="settings-group">
+    <h4>Honeypot-Feld <span class="badge badge-warn">wichtig</span></h4>
+    <div class="section-hint">
+      Ein verstecktes Feld im Formular gegen Spam. Muss leer gesendet werden, sein Name muss aber stimmen.
+    </div>
+    <div class="field"><label>Name des Honeypot-Felds</label><input type="text" id="cfg-honeypot" autocapitalize="off"></div>
+  </div>
+  <div class="settings-group">
+    <h4>Zusätzliche Hidden-Felder</h4>
+    <div class="section-hint">
+      Falls das Formular weitere Hidden-Felder mit festen Werten hat (z.B. <code>form_id=10002336</code>, <code>submit=Senden</code>),
+      hier eintragen — Format: <code>name=wert</code>, eine pro Zeile.
+    </div>
+    <div class="field">
+      <textarea id="cfg-hidden" rows="4" autocapitalize="off"
+        style="font-family: 'SF Mono', Menlo, monospace; font-size: 14px;"></textarea>
+    </div>
+  </div>
+  <button class="btn btn-primary btn-block" onclick="saveConfig()">Konfiguration speichern</button>
+</div>
+
+<div class="section">
+  <h3>Hilfe: Feldnamen herausfinden</h3>
+  <div style="font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
+    <p>Einmal am PC nötig:</p>
+    <ol style="padding-left: 20px;">
+      <li>Praxis-Formular im Browser öffnen</li>
+      <li>F12 drücken (Entwicklertools), Reiter <strong>Netzwerk</strong></li>
+      <li>Formular einmal mit Test-Daten ausfüllen und absenden</li>
+      <li>Im Netzwerk-Reiter den POST-Request anklicken → <strong>Payload / Form-Data</strong></li>
+      <li>Alle Feldnamen ablesen und hier oben eintragen</li>
+    </ol>
+    <p>Alternativ: Rechtsklick auf das Formular → <em>Element untersuchen</em> → Attribut <code>name="..."</code> bei jedem Feld ablesen.</p>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- ========== MODAL ========== -->
+
+  <div class="modal-bg" id="modal-bg">
+    <div class="modal">
+      <h3 id="modal-title">Vorschau</h3>
+      <div id="modal-body"></div>
+      <div class="btn-row" style="margin-top: 18px;">
+        <button class="btn btn-secondary" onclick="closeModal()">Schließen</button>
+        <button class="btn btn-primary" id="modal-confirm" style="display:none;" onclick="modalConfirm()">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Hidden form used for the actual POST -->
+
+  <form id="submit-form" method="POST" target="_blank" style="display:none;"></form>
+
+</div>
+
+<script>
+"use strict";
+
+// ============================================================
+// CONFIG: Defaults — anpassen in den Einstellungen
+// ============================================================
+const DEFAULTS = {
+  formAction: "https://www.gesundheitszentrum-schondra.de/formulare/index.php?form_id=10002336",
+  fieldNames: {
+    datum: "datum",
+    vorname: "vorname",
+    nachname: "nachname",
+    geburtsdatum: "geburtsdatum",
+    strasse: "strasse",
+    plz: "plz",
+    ort: "ort",
+    telefon: "telefon",
+    email: "email",
+    medikamente: ["medikament_1","medikament_2","medikament_3","medikament_4","medikament_5","medikament_6"]
+  },
+  honeypot: "",
+  extraHidden: "" // "name=value" pro Zeile
+};
+
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = "rezept-app-state-v1";
+let state = {
+  persons: [],
+  config: { ...DEFAULTS },
+  activePersonId: null,
+  selectedMeds: [],   // catalog ids
+  adHocMeds: [],      // free-text strings
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state.persons = parsed.persons || [];
+      state.config = { ...DEFAULTS, ...(parsed.config || {}) };
+      state.config.fieldNames = { ...DEFAULTS.fieldNames, ...(parsed.config?.fieldNames || {}) };
+    }
+  } catch (e) { console.warn("State load failed:", e); }
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      persons: state.persons,
+      config: state.config
+    }));
+  } catch (e) {
+    toast("Speichern fehlgeschlagen — bitte Backup machen!", true);
+  }
+}
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goto(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const el = document.getElementById("page-" + page);
+  if (el) el.classList.add("active");
+  window.scrollTo(0, 0);
+  if (page === "home") renderHome();
+  if (page === "settings") renderSettings();
+}
+
+// ============================================================
+// HOME PAGE
+// ============================================================
+function renderHome() {
+  const list = document.getElementById("person-list");
+  list.innerHTML = "";
+  if (state.persons.length === 0) {
+    list.innerHTML = `<div class="empty">
+      <span class="serif">Willkommen.</span>
+      Lege zuerst eine Person an — dich selbst, oder einen Angehörigen.
+    </div>`;
+    return;
+  }
+  state.persons.forEach(p => {
+    const initials = ((p.vorname||"")[0] || "?") + ((p.nachname||"")[0] || "");
+    const sub = [p.strasse, p.ort].filter(Boolean).join(", ") || "Stammdaten unvollständig";
+    const card = document.createElement("div");
+    card.className = "person-card";
+    card.innerHTML = `
+      <div class="person-avatar">${initials.toUpperCase()}</div>
+      <div class="person-info">
+        <div class="person-name">${escapeHtml(p.displayName || (p.vorname + " " + p.nachname))}</div>
+        <div class="person-sub">${escapeHtml(sub)}</div>
+      </div>
+      <span class="chevron">›</span>`;
+    card.onclick = () => openRequest(p.id);
+    list.appendChild(card);
+  });
+}
+
+// ============================================================
+// PERSON EDIT
+// ============================================================
+function newPerson() {
+  state.editingId = null;
+  setEditFields({ id: uid(), displayName: "", katalog: [] });
+  goto("edit");
+}
+function editPerson(id) {
+  const p = state.persons.find(x => x.id === id);
+  if (!p) return;
+  state.editingId = id;
+  setEditFields(p);
+  goto("edit");
+}
+function setEditFields(p) {
+  document.getElementById("ed-displayname").value = p.displayName || "";
+  document.getElementById("ed-vorname").value = p.vorname || "";
+  document.getElementById("ed-nachname").value = p.nachname || "";
+  document.getElementById("ed-geburtsdatum").value = p.geburtsdatum || "";
+  document.getElementById("ed-strasse").value = p.strasse || "";
+  document.getElementById("ed-plz").value = p.plz || "";
+  document.getElementById("ed-ort").value = p.ort || "";
+  document.getElementById("ed-telefon").value = p.telefon || "";
+  document.getElementById("ed-email").value = p.email || "";
+  state.editingPerson = JSON.parse(JSON.stringify(p));
+  if (!state.editingPerson.katalog) state.editingPerson.katalog = [];
+  renderEditCatalog();
+}
+function renderEditCatalog() {
+  const list = document.getElementById("ed-med-list");
+  list.innerHTML = "";
+  if (state.editingPerson.katalog.length === 0) {
+    list.innerHTML = `<div style="font-size:13px; color: var(--ink-faint); padding: 8px 0;">Noch keine Medikamente im Katalog.</div>`;
+    return;
+  }
+  state.editingPerson.katalog.forEach((m, i) => {
+    const row = document.createElement("div");
+    row.className = "med-row";
+    row.innerHTML = `
+      <div class="med-name">${escapeHtml(m.name)}</div>
+      <span class="del" onclick="event.stopPropagation();removeCatalogMed('${m.id}')">×</span>`;
+    list.appendChild(row);
+  });
+}
+function addCatalogMed() {
+  const inp = document.getElementById("ed-new-med");
+  const name = inp.value.trim();
+  if (!name) return;
+  state.editingPerson.katalog.push({ id: uid(), name });
+  inp.value = "";
+  renderEditCatalog();
+}
+function removeCatalogMed(id) {
+  state.editingPerson.katalog = state.editingPerson.katalog.filter(m => m.id !== id);
+  renderEditCatalog();
+}
+function savePerson() {
+  const p = state.editingPerson;
+  p.displayName = document.getElementById("ed-displayname").value.trim();
+  p.vorname = document.getElementById("ed-vorname").value.trim();
+  p.nachname = document.getElementById("ed-nachname").value.trim();
+  p.geburtsdatum = document.getElementById("ed-geburtsdatum").value;
+  p.strasse = document.getElementById("ed-strasse").value.trim();
+  p.plz = document.getElementById("ed-plz").value.trim();
+  p.ort = document.getElementById("ed-ort").value.trim();
+  p.telefon = document.getElementById("ed-telefon").value.trim();
+  p.email = document.getElementById("ed-email").value.trim();
+
+  if (!p.vorname || !p.nachname || !p.email) {
+    toast("Bitte mindestens Vorname, Nachname und E-Mail ausfüllen", true);
+    return;
+  }
+  if (!p.displayName) p.displayName = p.vorname + " " + p.nachname;
+
+  if (state.editingId) {
+    const idx = state.persons.findIndex(x => x.id === state.editingId);
+    if (idx >= 0) state.persons[idx] = p;
+  } else {
+    state.persons.push(p);
+  }
+  saveState();
+  toast("Gespeichert");
+  goto("home");
+}
+function deletePerson() {
+  if (!state.editingId) { goto("home"); return; }
+  showModal("Person löschen?", "Diese Aktion kann nicht rückgängig gemacht werden.", () => {
+    state.persons = state.persons.filter(x => x.id !== state.editingId);
+    saveState();
+    closeModal();
+    toast("Gelöscht");
+    goto("home");
+  });
+}
+
+// ============================================================
+// REQUEST PAGE
+// ============================================================
+function openRequest(personId) {
+  const p = state.persons.find(x => x.id === personId);
+  if (!p) return;
+  state.activePersonId = personId;
+  state.selectedMeds = [];
+  state.adHocMeds = [];
+  document.getElementById("request-title").textContent = p.displayName;
+  renderStammSummary(p);
+  renderRequestMedList();
+  renderAdHoc();
+  updateSubmitState();
+  goto("request");
+}
+function renderStammSummary(p) {
+  const summary = document.getElementById("stamm-summary");
+  const status = document.getElementById("stamm-status");
+  const required = ["vorname","nachname","geburtsdatum","strasse","plz","ort","email"];
+  const missing = required.filter(f => !p[f]);
+  if (missing.length) {
+    status.textContent = "unvollständig"; status.classList.add("badge-warn");
+  } else {
+    status.textContent = "vollständig"; status.classList.remove("badge-warn");
+  }
+  summary.innerHTML = `
+    <div>${escapeHtml(p.vorname)} ${escapeHtml(p.nachname)}, geb. ${formatDateDE(p.geburtsdatum)}</div>
+    <div>${escapeHtml(p.strasse || "")}</div>
+    <div>${escapeHtml(p.plz || "")} ${escapeHtml(p.ort || "")}</div>
+    <div>${escapeHtml(p.telefon || "—")} · ${escapeHtml(p.email || "")}</div>`;
+}
+function renderRequestMedList() {
+  const p = state.persons.find(x => x.id === state.activePersonId);
+  const list = document.getElementById("med-list-request");
+  list.innerHTML = "";
+  if (!p.katalog || p.katalog.length === 0) {
+    list.innerHTML = `<div style="font-size:13px; color: var(--ink-faint); padding: 8px 0;">
+      Noch keine Medikamente im Katalog. Person bearbeiten und welche anlegen.</div>`;
+    return;
+  }
+  p.katalog.forEach(m => {
+    const row = document.createElement("div");
+    row.className = "med-row" + (state.selectedMeds.includes(m.id) ? " selected" : "");
+    row.innerHTML = `<div class="checkbox"></div><div class="med-name">${escapeHtml(m.name)}</div>`;
+    row.onclick = () => toggleMed(m.id);
+    list.appendChild(row);
+  });
+}
+function toggleMed(id) {
+  const idx = state.selectedMeds.indexOf(id);
+  const total = state.selectedMeds.length + state.adHocMeds.length;
+  if (idx < 0) {
+    if (total >= 6) { toast("Maximal 6 Medikamente"); return; }
+    state.selectedMeds.push(id);
+  } else {
+    state.selectedMeds.splice(idx, 1);
+  }
+  renderRequestMedList();
+  updateSubmitState();
+}
+function addAdHocMed() {
+  const inp = document.getElementById("ad-hoc-med");
+  const name = inp.value.trim();
+  if (!name) return;
+  const total = state.selectedMeds.length + state.adHocMeds.length;
+  if (total >= 6) { toast("Maximal 6 Medikamente"); return; }
+  state.adHocMeds.push(name);
+  inp.value = "";
+  renderAdHoc();
+  updateSubmitState();
+}
+function removeAdHoc(idx) {
+  state.adHocMeds.splice(idx, 1);
+  renderAdHoc();
+  updateSubmitState();
+}
+function renderAdHoc() {
+  const wrap = document.getElementById("ad-hoc-list");
+  wrap.innerHTML = "";
+  state.adHocMeds.forEach((name, i) => {
+    const row = document.createElement("div");
+    row.className = "med-row selected";
+    row.innerHTML = `<div class="checkbox"></div><div class="med-name">${escapeHtml(name)}</div>
+      <span class="del" onclick="removeAdHoc(${i})">×</span>`;
+    wrap.appendChild(row);
+  });
+}
+function updateSubmitState() {
+  const total = state.selectedMeds.length + state.adHocMeds.length;
+  document.getElementById("sel-count").textContent = total + "/6";
+  document.getElementById("sub-count").textContent = total + " Medikamente ausgewählt";
+  document.getElementById("submit-btn").disabled = total === 0;
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
+function buildFormData() {
+  const p = state.persons.find(x => x.id === state.activePersonId);
+  if (!p) return null;
+  const cfg = state.config;
+  const fn = cfg.fieldNames;
+
+  const meds = [
+    ...state.selectedMeds.map(id => p.katalog.find(m => m.id === id)?.name).filter(Boolean),
+    ...state.adHocMeds
+  ].slice(0, 6);
+
+  const data = {};
+  if (fn.datum)         data[fn.datum] = formatDateDE(new Date().toISOString().slice(0,10));
+  if (fn.vorname)       data[fn.vorname] = p.vorname;
+  if (fn.nachname)      data[fn.nachname] = p.nachname;
+  if (fn.geburtsdatum)  data[fn.geburtsdatum] = formatDateDE(p.geburtsdatum);
+  if (fn.strasse)       data[fn.strasse] = p.strasse;
+  if (fn.plz)           data[fn.plz] = p.plz;
+  if (fn.ort)           data[fn.ort] = p.ort;
+  if (fn.telefon)       data[fn.telefon] = p.telefon;
+  if (fn.email)         data[fn.email] = p.email;
+  (fn.medikamente || []).forEach((name, i) => {
+    if (name) data[name] = meds[i] || "";
+  });
+
+  // Honeypot — explicitly empty
+  if (cfg.honeypot) data[cfg.honeypot] = "";
+
+  // Extra hidden fields (name=value, eine pro Zeile)
+  if (cfg.extraHidden) {
+    cfg.extraHidden.split("\n").forEach(line => {
+      const idx = line.indexOf("=");
+      if (idx > 0) {
+        const k = line.slice(0, idx).trim();
+        const v = line.slice(idx + 1).trim();
+        if (k) data[k] = v;
+      }
+    });
+  }
+  return data;
+}
+
+function previewRequest() {
+  const data = buildFormData();
+  if (!data) return;
+  const html = "<table style='font-size:13px;width:100%;border-collapse:collapse;'>"
+    + Object.entries(data).map(([k,v]) =>
+        `<tr><td style='padding:4px 8px 4px 0;color:var(--ink-soft);vertical-align:top;'><code>${escapeHtml(k)}</code></td>
+         <td style='padding:4px 0;'>${escapeHtml(v) || "<em style=\"color:var(--ink-faint)\">(leer)</em>"}</td></tr>`).join("")
+    + "</table>"
+    + `<p style='font-size:13px;color:var(--ink-soft);margin-top:14px;'>Ziel: <code>${escapeHtml(state.config.formAction)}</code></p>`;
+  showModal("Vorschau", html);
+}
+
+function submitRequest() {
+  const data = buildFormData();
+  if (!data) return;
+  const form = document.getElementById("submit-form");
+  form.action = state.config.formAction;
+  form.method = "POST";
+  form.target = "_blank";
+  form.innerHTML = "";
+  Object.entries(data).forEach(([k,v]) => {
+    const inp = document.createElement("input");
+    inp.type = "hidden"; inp.name = k; inp.value = v;
+    form.appendChild(inp);
+  });
+  form.submit();
+  toast("Wird gesendet… die Bestätigung erscheint im Browser-Tab");
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function renderSettings() {
+  const c = state.config;
+  document.getElementById("cfg-action").value = c.formAction || "";
+  document.getElementById("cfg-f-datum").value = c.fieldNames.datum || "";
+  document.getElementById("cfg-f-vorname").value = c.fieldNames.vorname || "";
+  document.getElementById("cfg-f-nachname").value = c.fieldNames.nachname || "";
+  document.getElementById("cfg-f-geburtsdatum").value = c.fieldNames.geburtsdatum || "";
+  document.getElementById("cfg-f-strasse").value = c.fieldNames.strasse || "";
+  document.getElementById("cfg-f-plz").value = c.fieldNames.plz || "";
+  document.getElementById("cfg-f-ort").value = c.fieldNames.ort || "";
+  document.getElementById("cfg-f-telefon").value = c.fieldNames.telefon || "";
+  document.getElementById("cfg-f-email").value = c.fieldNames.email || "";
+  for (let i = 0; i < 6; i++) {
+    document.getElementById("cfg-f-med-" + i).value = c.fieldNames.medikamente?.[i] || "";
+  }
+  document.getElementById("cfg-honeypot").value = c.honeypot || "";
+  document.getElementById("cfg-hidden").value = c.extraHidden || "";
+}
+function saveConfig() {
+  const meds = [];
+  for (let i = 0; i < 6; i++) {
+    meds.push(document.getElementById("cfg-f-med-" + i).value.trim());
+  }
+  state.config = {
+    formAction: document.getElementById("cfg-action").value.trim(),
+    fieldNames: {
+      datum: document.getElementById("cfg-f-datum").value.trim(),
+      vorname: document.getElementById("cfg-f-vorname").value.trim(),
+      nachname: document.getElementById("cfg-f-nachname").value.trim(),
+      geburtsdatum: document.getElementById("cfg-f-geburtsdatum").value.trim(),
+      strasse: document.getElementById("cfg-f-strasse").value.trim(),
+      plz: document.getElementById("cfg-f-plz").value.trim(),
+      ort: document.getElementById("cfg-f-ort").value.trim(),
+      telefon: document.getElementById("cfg-f-telefon").value.trim(),
+      email: document.getElementById("cfg-f-email").value.trim(),
+      medikamente: meds
+    },
+    honeypot: document.getElementById("cfg-honeypot").value.trim(),
+    extraHidden: document.getElementById("cfg-hidden").value
+  };
+  saveState();
+  toast("Konfiguration gespeichert");
+}
+
+// ============================================================
+// IMPORT / EXPORT
+// ============================================================
+function exportData() {
+  const data = JSON.stringify({
+    version: 1,
+    exported: new Date().toISOString(),
+    persons: state.persons,
+    config: state.config
+  }, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "rezept-backup-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast("Backup heruntergeladen");
+}
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.persons) throw new Error("Ungültiges Format");
+      showModal("Daten importieren?",
+        `Gefunden: <strong>${data.persons.length}</strong> Personen.<br>
+        Aktuelle Daten werden überschrieben.`,
+        () => {
+          state.persons = data.persons || [];
+          if (data.config) state.config = { ...DEFAULTS, ...data.config };
+          saveState();
+          renderSettings();
+          renderHome();
+          closeModal();
+          toast("Import erfolgreich");
+        });
+    } catch (err) {
+      toast("Import fehlgeschlagen: " + err.message, true);
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value = "";
+}
+
+// ============================================================
+// MODAL & TOAST
+// ============================================================
+let modalConfirmFn = null;
+function showModal(title, body, onConfirm) {
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-body").innerHTML = body;
+  document.getElementById("modal-confirm").style.display = onConfirm ? "" : "none";
+  modalConfirmFn = onConfirm || null;
+  document.getElementById("modal-bg").classList.add("show");
+}
+function closeModal() {
+  document.getElementById("modal-bg").classList.remove("show");
+  modalConfirmFn = null;
+}
+function modalConfirm() {
+  if (modalConfirmFn) modalConfirmFn();
+}
+document.getElementById("modal-bg").addEventListener("click", e => {
+  if (e.target.id === "modal-bg") closeModal();
+});
+
+let toastTimeout;
+function toast(msg, isError) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast show" + (isError ? " error" : "");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escapeHtml(s) {
+  if (s == null) return "";
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+}
+function formatDateDE(iso) {
+  if (!iso) return "—";
+  // ISO yyyy-mm-dd → dd.mm.yyyy
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (m) return `${m[3]}.${m[2]}.${m[1]}`;
+  return iso;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadState();
+renderHome();
+</script>
+
+</body>
+</html>
