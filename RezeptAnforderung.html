@@ -278,7 +278,7 @@
   <!-- ========== PAGE: HOME (Personenliste) ========== -->
   <div id="page-home" class="page active">
     <header class="top">
-      <h1 class="serif">Rezeptanforderung<small>Praxis Conze / Belic, Schondra</small></h1>
+      <h1 class="serif">Rezeptanforderung<small>Praxis Conze / Belic, Schondra · v<span id="app-version">…</span></small></h1>
       <button class="icon-btn" onclick="goto('settings')" aria-label="Einstellungen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
@@ -471,6 +471,9 @@
         </div>
       </div>
       <button class="btn btn-primary btn-block" onclick="saveConfig()">Konfiguration speichern</button>
+      <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="resetConfig()">
+        Auf Werkseinstellungen zurücksetzen
+      </button>
     </div>
 
     <div class="section">
@@ -512,6 +515,12 @@
 "use strict";
 
 // ============================================================
+// VERSION
+// ============================================================
+const APP_VERSION = "1.2.0";       // Sichtbar in der UI
+const CONFIG_VERSION = 2;          // bei Defaults-Änderung erhöhen
+
+// ============================================================
 // CONFIG: Defaults — anpassen in den Einstellungen
 // ============================================================
 const DEFAULTS = {
@@ -549,21 +558,35 @@ let state = {
 };
 
 function loadState() {
+  let configWasMigrated = false;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       state.persons = parsed.persons || [];
-      state.config = { ...DEFAULTS, ...(parsed.config || {}) };
-      state.config.fieldNames = { ...DEFAULTS.fieldNames, ...(parsed.config?.fieldNames || {}) };
+      const savedVersion = parsed.configVersion || 1;
+      if (savedVersion < CONFIG_VERSION) {
+        // Veraltete Konfiguration → Werkseinstellungen erzwingen
+        state.config = JSON.parse(JSON.stringify(DEFAULTS));
+        configWasMigrated = true;
+      } else {
+        state.config = { ...DEFAULTS, ...(parsed.config || {}) };
+        state.config.fieldNames = { ...DEFAULTS.fieldNames, ...(parsed.config?.fieldNames || {}) };
+      }
     }
   } catch (e) { console.warn("State load failed:", e); }
+  if (configWasMigrated) {
+    saveState();
+    setTimeout(() => toast("Formular-Konfiguration auf neue Werkseinstellungen aktualisiert"), 600);
+  }
 }
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       persons: state.persons,
-      config: state.config
+      config: state.config,
+      configVersion: CONFIG_VERSION,
+      appVersion: APP_VERSION
     }));
   } catch (e) {
     toast("Speichern fehlgeschlagen — bitte Backup machen!", true);
@@ -997,6 +1020,17 @@ function saveConfig() {
   saveState();
   toast("Konfiguration gespeichert");
 }
+function resetConfig() {
+  showModal("Konfiguration zurücksetzen?",
+    "Alle Formular-Einstellungen werden auf Werkseinstellungen zurückgesetzt. Stammdaten und Medikamente bleiben erhalten.",
+    () => {
+      state.config = JSON.parse(JSON.stringify(DEFAULTS));
+      saveState();
+      renderSettings();
+      closeModal();
+      toast("Konfiguration zurückgesetzt");
+    });
+}
 
 // ============================================================
 // IMPORT / EXPORT
@@ -1139,6 +1173,7 @@ async function showPersistenceStatus() {
 // ============================================================
 // INIT
 // ============================================================
+document.getElementById("app-version").textContent = APP_VERSION;
 loadState();
 renderHome();
 ensurePersistent();
