@@ -401,7 +401,7 @@
     </div>
 
     <div class="section">
-      <h3>Daten-Backup</h3>
+      <h3>Daten-Backup <span id="persist-status" class="badge">…</span></h3>
       <div class="section-hint">Da iOS die lokalen Daten gelegentlich löschen kann, regelmäßig sichern.</div>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="exportData()">Export (JSON)</button>
@@ -584,7 +584,14 @@ function renderHome() {
   if (state.persons.length === 0) {
     list.innerHTML = `<div class="empty">
       <span class="serif">Willkommen.</span>
-      Lege zuerst eine Person an — dich selbst, oder einen Angehörigen.
+      Lege eine Person an — oder importiere ein vorhandenes Backup aus iCloud Drive.
+      <div style="display:flex; flex-direction: column; gap: 10px; margin-top: 18px;">
+        <button class="btn btn-primary" onclick="newPerson()">Person anlegen</button>
+        <label class="btn btn-secondary file-input-wrap" style="cursor: pointer;">
+          Backup importieren (JSON)
+          <input type="file" accept="application/json,.json" onchange="importData(event)">
+        </label>
+      </div>
     </div>`;
     return;
   }
@@ -898,6 +905,7 @@ function submitRequest() {
 // ============================================================
 function renderSettings() {
   const c = state.config;
+  showPersistenceStatus();
   document.getElementById("cfg-action").value = c.formAction || "";
   document.getElementById("cfg-f-datum").value = c.fieldNames.datum || "";
   document.getElementById("cfg-f-vorname").value = c.fieldNames.vorname || "";
@@ -1043,10 +1051,47 @@ function tomorrowISO() {
 }
 
 // ============================================================
+// PERSISTENT STORAGE (gegen iOS-Cache-Löschung)
+// ============================================================
+async function ensurePersistent() {
+  if (!navigator.storage || !navigator.storage.persist) return null;
+  try {
+    const already = await navigator.storage.persisted();
+    if (already) return true;
+    return await navigator.storage.persist();
+  } catch (e) {
+    return null;
+  }
+}
+async function showPersistenceStatus() {
+  const el = document.getElementById("persist-status");
+  if (!el) return;
+  if (!navigator.storage || !navigator.storage.persisted) {
+    el.textContent = "Browser unterstützt keine dauerhafte Speicherung";
+    el.className = "badge badge-warn";
+    return;
+  }
+  try {
+    const persisted = await navigator.storage.persisted();
+    if (persisted) {
+      el.textContent = "dauerhaft gesichert";
+      el.className = "badge";
+    } else {
+      el.textContent = "kann von iOS gelöscht werden";
+      el.className = "badge badge-warn";
+    }
+  } catch (e) {
+    el.textContent = "Status unbekannt";
+    el.className = "badge badge-warn";
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
 loadState();
 renderHome();
+ensurePersistent();
 </script>
 </body>
 </html>
