@@ -342,12 +342,18 @@
 
     <div class="submit-bar">
       <div class="selection-count" id="sub-count">0 Medikamente ausgewählt</div>
-      <button class="btn btn-primary btn-block" id="submit-btn" onclick="submitRequest()" disabled>
-        Rezept anfordern
+      <button class="btn btn-primary btn-block" id="submit-btn" onclick="prefillRequest()" disabled>
+        Formular vorausfüllen
       </button>
       <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="previewRequest()">
         Vorschau (was wird gesendet?)
       </button>
+      <details style="margin-top: 8px;">
+        <summary style="text-align: center;">Erweitert</summary>
+        <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="submitRequest()">
+          Direkt absenden (alter Weg, evtl. Spam-Filter)
+        </button>
+      </details>
     </div>
   </div>
 
@@ -410,6 +416,16 @@
     <div class="page-nav">
       <span class="back" onclick="goto('home')">‹ Zurück</span>
       <h2 class="serif">Einstellungen</h2>
+    </div>
+
+    <div class="section">
+      <h3>Bookmarklet "Rezept ausfüllen"</h3>
+      <div class="section-hint">
+        Wird einmalig in Safari als Lesezeichen eingerichtet und füllt das Praxis-Formular per Tipp aus.
+      </div>
+      <button class="btn btn-secondary btn-block" onclick="showBookmarkletInfo()">
+        Anleitung & Code anzeigen
+      </button>
     </div>
 
     <div class="section">
@@ -526,7 +542,7 @@
 // ============================================================
 // VERSION
 // ============================================================
-const APP_VERSION = "1.5.0";       // Sichtbar in der UI
+const APP_VERSION = "1.6.0";       // Sichtbar in der UI
 const CONFIG_VERSION = 3;          // bei Defaults-Änderung erhöhen
 
 // ============================================================
@@ -1017,6 +1033,84 @@ function submitRequest() {
   });
   form.submit();
   toast("Wird gesendet… die Bestätigung erscheint im Browser-Tab");
+}
+
+// ============================================================
+// PREFILL-MODUS (Bookmarklet)
+// ============================================================
+const BOOKMARKLET_CODE = "javascript:(function(){try{var h=location.hash||'';var m=h.match(/prefill=([^&]+)/);if(!m){alert('Keine Vorausfülldaten gefunden — bitte erst über die Rezept-App das Formular öffnen.');return;}var data=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));var filled=0;Object.keys(data).forEach(function(name){document.querySelectorAll('[name=\"'+name+'\"]').forEach(function(el){if(el.type==='hidden')return;el.value=data[name];el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));filled++;});});history.replaceState({},'',location.pathname+location.search);alert('Vorausgefüllt: '+filled+' Felder. Bitte prüfen und absenden.');}catch(e){alert('Fehler: '+e.message);}})();";
+
+function buildPrefillData() {
+  // Wie buildFormData, aber ohne Honeypot/Hidden-Felder — die werden auf
+  // der Praxis-Seite vom Server selbst gesetzt und sollen nicht überschrieben werden
+  const data = buildFormData();
+  if (!data) return null;
+  const cfg = state.config;
+  if (cfg.honeypot) delete data[cfg.honeypot];
+  if (cfg.extraHidden) {
+    cfg.extraHidden.split("\n").forEach(line => {
+      const idx = line.indexOf("=");
+      const k = idx >= 0 ? line.slice(0, idx).trim() : line.trim();
+      if (k) delete data[k];
+    });
+  }
+  return data;
+}
+
+function prefillRequest() {
+  const data = buildPrefillData();
+  if (!data) return;
+  try {
+    const json = JSON.stringify(data);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    const url = state.config.formAction + "#prefill=" + encodeURIComponent(b64);
+    const win = window.open(url, "_blank");
+    if (!win) {
+      toast("Pop-up wurde blockiert — bitte in Safari erlauben", true);
+      return;
+    }
+    showModal("Formular geöffnet",
+      '<p style="font-size:14px; line-height:1.6;">' +
+      'Im neuen Tab steht jetzt das Praxis-Formular mit leeren Feldern.</p>' +
+      '<ol style="font-size:14px; line-height:1.7; padding-left: 20px;">' +
+      '<li>Tippe oben in Safari auf das <strong>Lesezeichen-Symbol</strong> (Buch)</li>' +
+      '<li>Wähle <strong>"Rezept ausfüllen"</strong></li>' +
+      '<li>Die Felder werden befüllt</li>' +
+      '<li>Prüfen → <strong>"Anfordern"</strong> tippen</li>' +
+      '</ol>' +
+      '<p style="font-size:13px; color: var(--ink-soft); margin-top:14px;">' +
+      'Bookmarklet noch nicht eingerichtet? <a href="#" onclick="closeModal();goto(\'settings\');return false;" style="color: var(--accent);">Anleitung in den Einstellungen</a></p>');
+  } catch (e) {
+    toast("Fehler beim Vorbereiten: " + e.message, true);
+  }
+}
+
+function showBookmarkletInfo() {
+  showModal("Bookmarklet einrichten (einmalig)",
+    '<p style="font-size:14px; margin-bottom:12px;">Damit das Vorausfüllen funktioniert, brauchst du in Safari einmalig ein Lesezeichen mit speziellem Code.</p>' +
+    '<p style="font-size:14px; font-weight:600; margin-bottom:6px;">Schritt-für-Schritt:</p>' +
+    '<ol style="font-size:13px; line-height:1.7; padding-left: 20px; margin-bottom:14px;">' +
+    '<li>Diese App in <strong>Safari</strong> öffnen (nicht vom Homescreen)</li>' +
+    '<li>Unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil) tippen</li>' +
+    '<li><strong>"Lesezeichen hinzufügen"</strong> wählen → Speichern</li>' +
+    '<li>Lesezeichen-Symbol unten (Buch) → <strong>"Bearbeiten"</strong> oben rechts</li>' +
+    '<li>Das eben angelegte Lesezeichen antippen</li>' +
+    '<li>Name ändern auf <strong>"Rezept ausfüllen"</strong></li>' +
+    '<li>Adresse <strong>komplett ersetzen</strong> durch den Code unten</li>' +
+    '<li>"Fertig" tippen, Speichern</li>' +
+    '</ol>' +
+    '<button class="btn btn-primary btn-block" onclick="copyBookmarkletCode(this)">Code in Zwischenablage kopieren</button>' +
+    '<p style="font-size:11px; color: var(--ink-soft); margin: 10px 0 4px;">Vorschau:</p>' +
+    '<pre style="max-height:140px; overflow:auto; font-size:10px;">' + escapeHtml(BOOKMARKLET_CODE) + '</pre>');
+}
+
+function copyBookmarkletCode(btn) {
+  navigator.clipboard.writeText(BOOKMARKLET_CODE).then(() => {
+    btn.textContent = "✓ Kopiert!";
+    setTimeout(() => btn.textContent = "Code in Zwischenablage kopieren", 2500);
+  }).catch(() => {
+    toast("Kopieren fehlgeschlagen — manuell aus dem Vorschau-Feld unten kopieren", true);
+  });
 }
 
 // ============================================================
