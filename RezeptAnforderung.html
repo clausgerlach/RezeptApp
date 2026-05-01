@@ -398,6 +398,9 @@
         <input type="text" id="ed-new-med" placeholder='z.B. "Metformin 1000 mg, N3"'>
         <button class="btn btn-secondary" onclick="addCatalogMed()">Hinzu</button>
       </div>
+      <button class="btn btn-secondary btn-block" style="margin-top: 8px;" onclick="openMedImport()">
+        Aus Foto-Text importieren
+      </button>
     </div>
 
     <div class="btn-row" style="margin-top: 20px;">
@@ -542,7 +545,7 @@
 // ============================================================
 // VERSION
 // ============================================================
-const APP_VERSION = "1.6.0";       // Sichtbar in der UI
+const APP_VERSION = "1.7.0";       // Sichtbar in der UI
 const CONFIG_VERSION = 3;          // bei Defaults-Änderung erhöhen
 
 // ============================================================
@@ -784,6 +787,94 @@ function addCatalogMed() {
 function removeCatalogMed(id) {
   state.editingPerson.katalog = state.editingPerson.katalog.filter(m => m.id !== id);
   renderEditCatalog();
+}
+
+// ============================================================
+// MEDIKAMENTEN-IMPORT (Live Text)
+// ============================================================
+function openMedImport() {
+  showModal("Medikamentenliste importieren",
+    '<p style="font-size:13px; color: var(--ink-soft); line-height:1.6; margin-bottom: 12px;">' +
+    '<strong>So gehts:</strong> Foto der Liste in der Fotos-App öffnen → auf Text tippen und halten → "Text auswählen" → markieren → kopieren → unten einfügen.' +
+    '</p>' +
+    '<textarea id="med-import-text" rows="6" placeholder="Hier einfügen…" ' +
+    'style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:8px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>' +
+    '<div id="med-import-preview" style="margin-top: 14px;"></div>',
+    importMedsFromText, "Hinzufügen");
+
+  setTimeout(() => {
+    const textarea = document.getElementById("med-import-text");
+    if (textarea) {
+      textarea.addEventListener("input", updateMedImportPreview);
+      updateMedImportPreview();
+    }
+  }, 50);
+}
+
+function parseMedLines(text) {
+  if (!text) return [];
+  return text.split(/\r?\n/)
+    .map(s => s.replace(/^\s*\d{1,3}[\.\)]\s+/, ""))    // führende "1." oder "1)"
+    .map(s => s.replace(/^\s*[•·\-\*\>]\s+/, ""))       // führende Bullets
+    .map(s => s.trim())
+    .filter(s => s.length >= 3)
+    .filter(s => !/^\d+$/.test(s))                       // reine Zahlen (Seitenzahlen)
+    .filter(s => !/^[\s\-_=]+$/.test(s));                // reine Trennlinien
+}
+
+function updateMedImportPreview() {
+  const text = document.getElementById("med-import-text")?.value || "";
+  const lines = parseMedLines(text);
+  const existing = new Set(
+    (state.editingPerson?.katalog || []).map(m => m.name.toLowerCase())
+  );
+  const preview = document.getElementById("med-import-preview");
+  if (!preview) return;
+
+  if (lines.length === 0) {
+    preview.innerHTML = '<div style="color: var(--ink-faint); font-size: 13px; text-align: center; padding: 8px;">Noch nichts erkannt</div>';
+    return;
+  }
+
+  const newLines = lines.filter(l => !existing.has(l.toLowerCase()));
+  const dupes = lines.length - newLines.length;
+
+  let html = '<div style="font-size:13px; color: var(--ink-soft); margin-bottom: 6px;">';
+  html += '<strong>' + newLines.length + '</strong> neue Einträge';
+  if (dupes > 0) html += ' · ' + dupes + ' bereits vorhanden';
+  html += '</div>';
+  html += '<div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--rule); border-radius: 8px; padding: 4px;">';
+  lines.forEach(line => {
+    const isDupe = existing.has(line.toLowerCase());
+    html += '<div style="padding: 6px 10px; font-size: 13px; border-bottom: 1px solid var(--rule);' +
+      (isDupe ? 'color: var(--ink-faint); text-decoration: line-through;' : '') + '">' +
+      escapeHtml(line) +
+      (isDupe ? ' <span style="font-size:11px;">(bereits vorhanden)</span>' : '') +
+      '</div>';
+  });
+  html += '</div>';
+  preview.innerHTML = html;
+}
+
+function importMedsFromText() {
+  const text = document.getElementById("med-import-text")?.value || "";
+  const lines = parseMedLines(text);
+  const existing = new Set(state.editingPerson.katalog.map(m => m.name.toLowerCase()));
+  let added = 0;
+  lines.forEach(line => {
+    if (!existing.has(line.toLowerCase())) {
+      state.editingPerson.katalog.push({ id: uid(), name: line });
+      existing.add(line.toLowerCase());
+      added++;
+    }
+  });
+  closeModal();
+  renderEditCatalog();
+  if (added === 0) {
+    toast("Keine neuen Medikamente erkannt");
+  } else {
+    toast(added + " Medikament" + (added === 1 ? "" : "e") + " hinzugefügt");
+  }
 }
 function savePerson() {
   const p = state.editingPerson;
@@ -1225,10 +1316,12 @@ function importData(ev) {
 // MODAL & TOAST
 // ============================================================
 let modalConfirmFn = null;
-function showModal(title, body, onConfirm) {
+function showModal(title, body, onConfirm, confirmLabel) {
   document.getElementById("modal-title").textContent = title;
   document.getElementById("modal-body").innerHTML = body;
-  document.getElementById("modal-confirm").style.display = onConfirm ? "" : "none";
+  const btn = document.getElementById("modal-confirm");
+  btn.style.display = onConfirm ? "" : "none";
+  btn.textContent = confirmLabel || "Bestätigen";
   modalConfirmFn = onConfirm || null;
   document.getElementById("modal-bg").classList.add("show");
 }
