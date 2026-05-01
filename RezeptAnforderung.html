@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -43,242 +42,240 @@
   .serif { font-family: "Iowan Old Style", "Palatino", "Georgia", serif; }
   .app { max-width: 540px; margin: 0 auto; padding: 0 18px 80px; }
 
-/* Header */
-header.top {
-padding: 22px 0 12px;
-display: flex; align-items: center; justify-content: space-between;
-}
-header.top h1 {
-font-family: “Iowan Old Style”, “Palatino”, “Georgia”, serif;
-font-size: 26px; font-weight: 600; margin: 0; letter-spacing: -0.01em;
-}
-header.top h1 small {
-display: block; font-size: 13px; color: var(–ink-soft);
-font-style: italic; font-weight: 400; margin-top: 2px;
-}
-.icon-btn {
-width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(–rule);
-background: var(–bg-card); display: inline-flex; align-items: center; justify-content: center;
-cursor: pointer; padding: 0; color: var(–ink-soft);
-}
-.icon-btn:active { background: var(–bg-soft); }
-.icon-btn svg { width: 20px; height: 20px; }
+  /* Header */
+  header.top {
+    padding: 22px 0 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header.top h1 {
+    font-family: "Iowan Old Style", "Palatino", "Georgia", serif;
+    font-size: 26px; font-weight: 600; margin: 0; letter-spacing: -0.01em;
+  }
+  header.top h1 small {
+    display: block; font-size: 13px; color: var(--ink-soft);
+    font-style: italic; font-weight: 400; margin-top: 2px;
+  }
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--rule);
+    background: var(--bg-card); display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0; color: var(--ink-soft);
+  }
+  .icon-btn:active { background: var(--bg-soft); }
+  .icon-btn svg { width: 20px; height: 20px; }
 
-/* Pages */
-.page { display: none; }
-.page.active { display: block; }
+  /* Pages */
+  .page { display: none; }
+  .page.active { display: block; }
 
-/* Person cards */
-.person-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.person-card {
-background: var(–bg-card); border-radius: var(–radius);
-padding: 16px 18px; box-shadow: var(–shadow);
-display: flex; align-items: center; gap: 14px;
-cursor: pointer; border: 1px solid transparent;
-transition: border-color .15s;
-}
-.person-card:active { border-color: var(–accent); }
-.person-avatar {
-width: 44px; height: 44px; border-radius: 50%;
-background: var(–accent-bg); color: var(–accent);
-display: flex; align-items: center; justify-content: center;
-font-family: “Iowan Old Style”, serif; font-size: 19px; font-weight: 600;
-flex-shrink: 0;
-}
-.person-info { flex: 1; min-width: 0; }
-.person-name { font-weight: 600; font-size: 17px; }
-.person-sub { font-size: 13px; color: var(–ink-soft); margin-top: 2px;
-overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chevron { color: var(–ink-faint); }
+  /* Person cards */
+  .person-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .person-card {
+    background: var(--bg-card); border-radius: var(--radius);
+    padding: 16px 18px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; border: 1px solid transparent;
+    transition: border-color .15s;
+  }
+  .person-card:active { border-color: var(--accent); }
+  .person-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent-bg); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Iowan Old Style", serif; font-size: 19px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .person-info { flex: 1; min-width: 0; }
+  .person-name { font-weight: 600; font-size: 17px; }
+  .person-sub { font-size: 13px; color: var(--ink-soft); margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chevron { color: var(--ink-faint); }
 
-.empty {
-text-align: center; padding: 50px 20px; color: var(–ink-soft);
-border: 1px dashed var(–rule); border-radius: var(–radius); margin-top: 16px;
-}
-.empty .serif { font-size: 22px; color: var(–ink); margin-bottom: 6px; display: block; }
+  .empty {
+    text-align: center; padding: 50px 20px; color: var(--ink-soft);
+    border: 1px dashed var(--rule); border-radius: var(--radius); margin-top: 16px;
+  }
+  .empty .serif { font-size: 22px; color: var(--ink); margin-bottom: 6px; display: block; }
 
-/* Buttons */
-.btn {
-display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-padding: 14px 20px; border-radius: var(–radius-sm);
-font-size: 16px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
-font-family: inherit;
-}
-.btn-primary {
-background: var(–accent); color: var(–bg);
-box-shadow: 0 1px 2px rgba(0,0,0,.08);
-}
-.btn-primary:active { background: var(–accent-soft); }
-.btn-primary:disabled { background: var(–ink-faint); cursor: not-allowed; }
-.btn-secondary {
-background: var(–bg-card); color: var(–ink);
-border-color: var(–rule);
-}
-.btn-secondary:active { background: var(–bg-soft); }
-.btn-danger { color: var(–danger); background: var(–bg-card); border-color: var(–rule); }
-.btn-block { width: 100%; }
-.btn-row { display: flex; gap: 10px; margin-top: 14px; }
-.btn-row .btn { flex: 1; }
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 20px; border-radius: var(--radius-sm);
+    font-size: 16px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--accent); color: var(--bg);
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  }
+  .btn-primary:active { background: var(--accent-soft); }
+  .btn-primary:disabled { background: var(--ink-faint); cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--bg-card); color: var(--ink);
+    border-color: var(--rule);
+  }
+  .btn-secondary:active { background: var(--bg-soft); }
+  .btn-danger { color: var(--danger); background: var(--bg-card); border-color: var(--rule); }
+  .btn-block { width: 100%; }
+  .btn-row { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-row .btn { flex: 1; }
 
-/* Page nav */
-.page-nav {
-display: flex; align-items: center; gap: 10px; padding: 14px 0 6px;
-}
-.page-nav .back {
-color: var(–accent); cursor: pointer; font-size: 16px;
-display: inline-flex; align-items: center; gap: 4px;
-margin-left: -4px;
-}
-.page-nav h2 {
-font-family: “Iowan Old Style”, serif; font-size: 22px; font-weight: 600;
-margin: 0; flex: 1; text-align: center; padding-right: 60px;
-}
+  /* Page nav */
+  .page-nav {
+    display: flex; align-items: center; gap: 10px; padding: 14px 0 6px;
+  }
+  .page-nav .back {
+    color: var(--accent); cursor: pointer; font-size: 16px;
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-left: -4px;
+  }
+  .page-nav h2 {
+    font-family: "Iowan Old Style", serif; font-size: 22px; font-weight: 600;
+    margin: 0; flex: 1; text-align: center; padding-right: 60px;
+  }
 
-/* Forms */
-.field { margin-bottom: 14px; }
-.field label {
-display: block; font-size: 13px; color: var(–ink-soft);
-margin-bottom: 4px; font-weight: 500;
-}
-.field input, .field textarea, .field select {
-width: 100%; padding: 12px 14px;
-border: 1px solid var(–rule); border-radius: var(–radius-sm);
-background: var(–bg-card); font-family: inherit; font-size: 16px;
-color: var(–ink);
-}
-.field input:focus, .field textarea:focus, .field select:focus {
-outline: none; border-color: var(–accent);
-}
-.field-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
-.field-row-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  /* Forms */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 13px; color: var(--ink-soft);
+    margin-bottom: 4px; font-weight: 500;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 12px 14px;
+    border: 1px solid var(--rule); border-radius: var(--radius-sm);
+    background: var(--bg-card); font-family: inherit; font-size: 16px;
+    color: var(--ink);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-/* Sections */
-.section {
-background: var(–bg-card); border-radius: var(–radius);
-padding: 18px; margin-top: 14px; box-shadow: var(–shadow);
-}
-.section h3 {
-font-family: “Iowan Old Style”, serif; font-size: 17px; font-weight: 600;
-margin: 0 0 14px; display: flex; align-items: center; justify-content: space-between;
-}
-.section-hint { font-size: 13px; color: var(–ink-soft); margin: -8px 0 14px; }
+  /* Sections */
+  .section {
+    background: var(--bg-card); border-radius: var(--radius);
+    padding: 18px; margin-top: 14px; box-shadow: var(--shadow);
+  }
+  .section h3 {
+    font-family: "Iowan Old Style", serif; font-size: 17px; font-weight: 600;
+    margin: 0 0 14px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-hint { font-size: 13px; color: var(--ink-soft); margin: -8px 0 14px; }
 
-/* Medikament list */
-.med-list { display: flex; flex-direction: column; gap: 8px; }
-.med-row {
-display: flex; align-items: center; gap: 10px;
-padding: 12px 14px; background: var(–bg-soft); border-radius: var(–radius-sm);
-border: 1px solid transparent; cursor: pointer;
-transition: all .15s;
-}
-.med-row.selected {
-background: var(–accent-bg); border-color: var(–accent);
-}
-.med-row .checkbox {
-width: 22px; height: 22px; border: 2px solid var(–ink-faint);
-border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-background: var(–bg-card);
-}
-.med-row.selected .checkbox {
-background: var(–accent); border-color: var(–accent);
-}
-.med-row.selected .checkbox::after {
-content: “”; width: 11px; height: 6px;
-border-left: 2px solid var(–bg); border-bottom: 2px solid var(–bg);
-transform: rotate(-45deg) translate(1px,-1px);
-}
-.med-name { flex: 1; font-size: 15px; }
-.med-row .del {
-color: var(–ink-faint); padding: 4px 8px;
-margin-left: auto; cursor: pointer; font-size: 18px;
-}
-.med-input-row { display: flex; gap: 8px; margin-top: 10px; }
-.med-input-row input { flex: 1; }
-.med-input-row .btn { padding: 12px 16px; }
+  /* Medikament list */
+  .med-list { display: flex; flex-direction: column; gap: 8px; }
+  .med-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; background: var(--bg-soft); border-radius: var(--radius-sm);
+    border: 1px solid transparent; cursor: pointer;
+    transition: all .15s;
+  }
+  .med-row.selected {
+    background: var(--accent-bg); border-color: var(--accent);
+  }
+  .med-row .checkbox {
+    width: 22px; height: 22px; border: 2px solid var(--ink-faint);
+    border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-card);
+  }
+  .med-row.selected .checkbox {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .med-row.selected .checkbox::after {
+    content: ""; width: 11px; height: 6px;
+    border-left: 2px solid var(--bg); border-bottom: 2px solid var(--bg);
+    transform: rotate(-45deg) translate(1px,-1px);
+  }
+  .med-name { flex: 1; font-size: 15px; }
+  .med-row .del {
+    color: var(--ink-faint); padding: 4px 8px;
+    margin-left: auto; cursor: pointer; font-size: 18px;
+  }
+  .med-input-row { display: flex; gap: 8px; margin-top: 10px; }
+  .med-input-row input { flex: 1; }
+  .med-input-row .btn { padding: 12px 16px; }
 
-.badge {
-display: inline-block; background: var(–accent-bg); color: var(–accent);
-padding: 2px 9px; border-radius: 10px; font-size: 12px; font-weight: 600;
-}
-.badge-warn { background: #fcefe2; color: var(–warning); }
+  .badge {
+    display: inline-block; background: var(--accent-bg); color: var(--accent);
+    padding: 2px 9px; border-radius: 10px; font-size: 12px; font-weight: 600;
+  }
+  .badge-warn { background: #fcefe2; color: var(--warning); }
 
-/* Submit area */
-.submit-bar {
-position: sticky; bottom: 0;
-background: linear-gradient(to bottom, transparent, var(–bg) 30%);
-padding: 30px 0 calc(env(safe-area-inset-bottom) + 12px);
-margin: 20px -18px -80px;
-padding-left: 18px; padding-right: 18px;
-}
-.selection-count {
-text-align: center; font-size: 13px; color: var(–ink-soft);
-margin-bottom: 8px;
-}
+  /* Submit area */
+  .submit-bar {
+    position: sticky; bottom: 0;
+    background: linear-gradient(to bottom, transparent, var(--bg) 30%);
+    padding: 30px 0 calc(env(safe-area-inset-bottom) + 12px);
+    margin: 20px -18px -80px;
+    padding-left: 18px; padding-right: 18px;
+  }
+  .selection-count {
+    text-align: center; font-size: 13px; color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
 
-/* Modal */
-.modal-bg {
-position: fixed; inset: 0; background: rgba(45,37,32,.55);
-display: none; align-items: center; justify-content: center;
-z-index: 100; padding: 20px;
-}
-.modal-bg.show { display: flex; }
-.modal {
-background: var(–bg); border-radius: var(–radius);
-max-width: 460px; width: 100%; padding: 22px;
-max-height: 90vh; overflow-y: auto;
-}
-.modal h3 {
-font-family: “Iowan Old Style”, serif; font-size: 19px; font-weight: 600;
-margin: 0 0 12px;
-}
-.modal-text { font-size: 14px; color: var(–ink-soft); margin-bottom: 16px; }
+  /* Modal */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(45,37,32,.55);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--bg); border-radius: var(--radius);
+    max-width: 460px; width: 100%; padding: 22px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h3 {
+    font-family: "Iowan Old Style", serif; font-size: 19px; font-weight: 600;
+    margin: 0 0 12px;
+  }
+  .modal-text { font-size: 14px; color: var(--ink-soft); margin-bottom: 16px; }
 
-/* Toast */
-.toast {
-position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 50%;
-transform: translateX(-50%) translateY(100px);
-background: var(–ink); color: var(–bg);
-padding: 12px 20px; border-radius: var(–radius-sm);
-font-size: 14px; opacity: 0; transition: all .25s;
-pointer-events: none; z-index: 200; max-width: 90%;
-}
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.toast.error { background: var(–danger); }
+  /* Toast */
+  .toast {
+    position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink); color: var(--bg);
+    padding: 12px 20px; border-radius: var(--radius-sm);
+    font-size: 14px; opacity: 0; transition: all .25s;
+    pointer-events: none; z-index: 200; max-width: 90%;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.error { background: var(--danger); }
 
-/* Settings panel */
-.settings-group { margin-bottom: 22px; }
-.settings-group h4 {
-font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
-color: var(–ink-soft); margin: 0 0 8px; font-weight: 600;
-}
-.mapping-grid {
-display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-}
-.file-input-wrap {
-position: relative; overflow: hidden; display: inline-flex;
-}
-.file-input-wrap input[type=file] {
-position: absolute; inset: 0; opacity: 0; cursor: pointer;
-}
+  /* Settings panel */
+  .settings-group { margin-bottom: 22px; }
+  .settings-group h4 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--ink-soft); margin: 0 0 8px; font-weight: 600;
+  }
+  .mapping-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .file-input-wrap {
+    position: relative; overflow: hidden; display: inline-flex;
+  }
+  .file-input-wrap input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
 
-details summary {
-cursor: pointer; padding: 8px 0; font-size: 14px;
-color: var(–ink-soft); user-select: none;
-}
-details[open] summary { color: var(–ink); }
-pre {
-background: var(–bg-soft); padding: 12px; border-radius: var(–radius-sm);
-font-size: 12px; overflow-x: auto;
-font-family: “SF Mono”, “Menlo”, monospace;
-}
+  details summary {
+    cursor: pointer; padding: 8px 0; font-size: 14px;
+    color: var(--ink-soft); user-select: none;
+  }
+  details[open] summary { color: var(--ink); }
+  pre {
+    background: var(--bg-soft); padding: 12px; border-radius: var(--radius-sm);
+    font-size: 12px; overflow-x: auto;
+    font-family: "SF Mono", "Menlo", monospace;
+  }
 </style>
-
 </head>
 <body>
 <div class="app">
 
   <!-- ========== PAGE: HOME (Personenliste) ========== -->
-
   <div id="page-home" class="page active">
     <header class="top">
       <h1 class="serif">Rezeptanforderung<small>Praxis Conze / Belic, Schondra</small></h1>
@@ -287,211 +284,200 @@ font-family: “SF Mono”, “Menlo”, monospace;
       </button>
     </header>
 
-```
-<div id="person-list" class="person-list"></div>
+    <div id="person-list" class="person-list"></div>
 
-<div style="margin-top: 16px;">
-  <button class="btn btn-secondary btn-block" onclick="newPerson()">
-    <span style="font-size:18px;">+</span> Person hinzufügen
-  </button>
-</div>
-```
-
+    <div style="margin-top: 16px;">
+      <button class="btn btn-secondary btn-block" onclick="newPerson()">
+        <span style="font-size:18px;">+</span> Person hinzufügen
+      </button>
+    </div>
   </div>
 
   <!-- ========== PAGE: ANFORDERN ========== -->
-
   <div id="page-request" class="page">
     <div class="page-nav">
       <span class="back" onclick="goto('home')">‹ Zurück</span>
       <h2 class="serif" id="request-title">—</h2>
     </div>
 
-```
-<div class="section">
-  <h3>Stammdaten <span class="badge" id="stamm-status">vollständig</span></h3>
-  <div id="stamm-summary" style="font-size:14px; color: var(--ink-soft); line-height:1.6;"></div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" onclick="editPerson(state.activePersonId)">Bearbeiten</button>
-  </div>
-</div>
-
-<div class="section">
-  <h3>Medikamente <span id="sel-count" class="badge">0/6</span></h3>
-  <div class="section-hint">Bis zu 6 Medikamente auswählen</div>
-  <div id="med-list-request" class="med-list"></div>
-
-  <details style="margin-top:14px;">
-    <summary>Einmaliges Medikament hinzufügen (nicht im Katalog speichern)</summary>
-    <div class="med-input-row">
-      <input type="text" id="ad-hoc-med" placeholder="Medikament-Name + Stärke">
-      <button class="btn btn-secondary" onclick="addAdHocMed()">Hinzu</button>
+    <div class="section">
+      <h3>Stammdaten <span class="badge" id="stamm-status">vollständig</span></h3>
+      <div id="stamm-summary" style="font-size:14px; color: var(--ink-soft); line-height:1.6;"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="editPerson(state.activePersonId)">Bearbeiten</button>
+      </div>
     </div>
-    <div id="ad-hoc-list" style="margin-top:10px;"></div>
-  </details>
-</div>
 
-<div class="submit-bar">
-  <div class="selection-count" id="sub-count">0 Medikamente ausgewählt</div>
-  <button class="btn btn-primary btn-block" id="submit-btn" onclick="submitRequest()" disabled>
-    Rezept anfordern
-  </button>
-  <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="previewRequest()">
-    Vorschau (was wird gesendet?)
-  </button>
-</div>
-```
+    <div class="section">
+      <h3>Medikamente <span id="sel-count" class="badge">0/6</span></h3>
+      <div class="section-hint">Bis zu 6 Medikamente auswählen</div>
+      <div id="med-list-request" class="med-list"></div>
 
+      <details style="margin-top:14px;">
+        <summary>Einmaliges Medikament hinzufügen (nicht im Katalog speichern)</summary>
+        <div class="med-input-row">
+          <input type="text" id="ad-hoc-med" placeholder="Medikament-Name + Stärke">
+          <button class="btn btn-secondary" onclick="addAdHocMed()">Hinzu</button>
+        </div>
+        <div id="ad-hoc-list" style="margin-top:10px;"></div>
+      </details>
+    </div>
+
+    <div class="submit-bar">
+      <div class="selection-count" id="sub-count">0 Medikamente ausgewählt</div>
+      <button class="btn btn-primary btn-block" id="submit-btn" onclick="submitRequest()" disabled>
+        Rezept anfordern
+      </button>
+      <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="previewRequest()">
+        Vorschau (was wird gesendet?)
+      </button>
+    </div>
   </div>
 
   <!-- ========== PAGE: PERSON BEARBEITEN ========== -->
-
   <div id="page-edit" class="page">
     <div class="page-nav">
       <span class="back" onclick="goto('home')">‹ Zurück</span>
       <h2 class="serif">Person</h2>
     </div>
 
-```
-<div class="section">
-  <h3>Anzeigename</h3>
-  <div class="field">
-    <input type="text" id="ed-displayname" placeholder='z.B. "Ich" oder "Mutter"'>
-  </div>
-</div>
+    <div class="section">
+      <h3>Anzeigename</h3>
+      <div class="field">
+        <input type="text" id="ed-displayname" placeholder='z.B. "Ich" oder "Mutter"'>
+      </div>
+    </div>
 
-<div class="section">
-  <h3>Stammdaten</h3>
-  <div class="field-row-3">
-    <div class="field"><label>Vorname *</label><input type="text" id="ed-vorname"></div>
-    <div class="field"><label>Nachname *</label><input type="text" id="ed-nachname"></div>
-  </div>
-  <div class="field"><label>Geburtsdatum *</label><input type="date" id="ed-geburtsdatum"></div>
-  <div class="field"><label>Straße + Hausnr. *</label><input type="text" id="ed-strasse"></div>
-  <div class="field-row">
-    <div class="field"><label>PLZ *</label><input type="text" id="ed-plz" inputmode="numeric"></div>
-    <div class="field"><label>Ort *</label><input type="text" id="ed-ort"></div>
-  </div>
-  <div class="field"><label>Telefon</label><input type="tel" id="ed-telefon"></div>
-  <div class="field"><label>E-Mail *</label><input type="email" id="ed-email" autocapitalize="off"></div>
-</div>
+    <div class="section">
+      <h3>Stammdaten</h3>
+      <div class="field-row-3">
+        <div class="field"><label>Vorname *</label><input type="text" id="ed-vorname"></div>
+        <div class="field"><label>Nachname *</label><input type="text" id="ed-nachname"></div>
+      </div>
+      <div class="field"><label>Geburtsdatum *</label><input type="date" id="ed-geburtsdatum"></div>
+      <div class="field"><label>Straße + Hausnr. *</label><input type="text" id="ed-strasse"></div>
+      <div class="field-row">
+        <div class="field"><label>PLZ *</label><input type="text" id="ed-plz" inputmode="numeric"></div>
+        <div class="field"><label>Ort *</label><input type="text" id="ed-ort"></div>
+      </div>
+      <div class="field"><label>Telefon</label><input type="tel" id="ed-telefon"></div>
+      <div class="field"><label>E-Mail *</label><input type="email" id="ed-email" autocapitalize="off"></div>
+    </div>
 
-<div class="section">
-  <h3>Medikamenten-Katalog</h3>
-  <div class="section-hint">Häufig benötigte Medikamente — werden bei der Anforderung zur Auswahl angeboten.</div>
-  <div id="ed-med-list" class="med-list"></div>
-  <div class="med-input-row">
-    <input type="text" id="ed-new-med" placeholder='z.B. "Metformin 1000 mg, N3"'>
-    <button class="btn btn-secondary" onclick="addCatalogMed()">Hinzu</button>
-  </div>
-</div>
+    <div class="section">
+      <h3>Medikamenten-Katalog</h3>
+      <div class="section-hint">Häufig benötigte Medikamente — werden bei der Anforderung zur Auswahl angeboten.</div>
+      <div id="ed-med-list" class="med-list"></div>
+      <div class="med-input-row">
+        <input type="text" id="ed-new-med" placeholder='z.B. "Metformin 1000 mg, N3"'>
+        <button class="btn btn-secondary" onclick="addCatalogMed()">Hinzu</button>
+      </div>
+    </div>
 
-<div class="btn-row" style="margin-top: 20px;">
-  <button class="btn btn-primary" onclick="savePerson()">Speichern</button>
-  <button class="btn btn-danger" onclick="deletePerson()">Löschen</button>
-</div>
-```
-
+    <div class="btn-row" style="margin-top: 20px;">
+      <button class="btn btn-primary" onclick="savePerson()">Speichern</button>
+      <button class="btn btn-danger" onclick="deletePerson()">Löschen</button>
+    </div>
+    <div style="margin-top: 10px;">
+      <button class="btn btn-secondary btn-block" onclick="duplicateAsTemplate()">
+        Als neue Person kopieren (ohne Medikamente)
+      </button>
+    </div>
   </div>
 
   <!-- ========== PAGE: SETTINGS ========== -->
-
   <div id="page-settings" class="page">
     <div class="page-nav">
       <span class="back" onclick="goto('home')">‹ Zurück</span>
       <h2 class="serif">Einstellungen</h2>
     </div>
 
-```
-<div class="section">
-  <h3>Daten-Backup</h3>
-  <div class="section-hint">Da iOS die lokalen Daten gelegentlich löschen kann, regelmäßig sichern.</div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" onclick="exportData()">Export (JSON)</button>
-    <button class="btn btn-secondary file-input-wrap">
-      Import
-      <input type="file" accept="application/json" onchange="importData(event)">
-    </button>
-  </div>
-</div>
+    <div class="section">
+      <h3>Daten-Backup</h3>
+      <div class="section-hint">Da iOS die lokalen Daten gelegentlich löschen kann, regelmäßig sichern.</div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="exportData()">Export (JSON)</button>
+        <button class="btn btn-secondary file-input-wrap">
+          Import
+          <input type="file" accept="application/json" onchange="importData(event)">
+        </button>
+      </div>
+    </div>
 
-<div class="section">
-  <h3>Formular-Konfiguration</h3>
-  <div class="section-hint">
-    Diese Werte musst du <em>einmal</em> einrichten. Anleitung am Ende der Seite.
-  </div>
-  <div class="settings-group">
-    <h4>Form-URL</h4>
-    <div class="field">
-      <input type="url" id="cfg-action" autocapitalize="off">
+    <div class="section">
+      <h3>Formular-Konfiguration</h3>
+      <div class="section-hint">
+        Diese Werte musst du <em>einmal</em> einrichten. Anleitung am Ende der Seite.
+      </div>
+      <div class="settings-group">
+        <h4>Form-URL</h4>
+        <div class="field">
+          <input type="url" id="cfg-action" autocapitalize="off">
+        </div>
+      </div>
+      <div class="settings-group">
+        <h4>Feldname-Zuordnung</h4>
+        <div class="mapping-grid">
+          <div class="field"><label>Datum</label><input type="text" id="cfg-f-datum" autocapitalize="off"></div>
+          <div class="field"><label>Vorname</label><input type="text" id="cfg-f-vorname" autocapitalize="off"></div>
+          <div class="field"><label>Nachname</label><input type="text" id="cfg-f-nachname" autocapitalize="off"></div>
+          <div class="field"><label>Geburtsdatum</label><input type="text" id="cfg-f-geburtsdatum" autocapitalize="off"></div>
+          <div class="field"><label>Straße</label><input type="text" id="cfg-f-strasse" autocapitalize="off"></div>
+          <div class="field"><label>PLZ</label><input type="text" id="cfg-f-plz" autocapitalize="off"></div>
+          <div class="field"><label>Ort</label><input type="text" id="cfg-f-ort" autocapitalize="off"></div>
+          <div class="field"><label>Telefon</label><input type="text" id="cfg-f-telefon" autocapitalize="off"></div>
+          <div class="field"><label>E-Mail</label><input type="text" id="cfg-f-email" autocapitalize="off"></div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h4>Medikament-Felder (1 bis 6)</h4>
+        <div class="mapping-grid">
+          <div class="field"><label>Med 1</label><input type="text" id="cfg-f-med-0" autocapitalize="off"></div>
+          <div class="field"><label>Med 2</label><input type="text" id="cfg-f-med-1" autocapitalize="off"></div>
+          <div class="field"><label>Med 3</label><input type="text" id="cfg-f-med-2" autocapitalize="off"></div>
+          <div class="field"><label>Med 4</label><input type="text" id="cfg-f-med-3" autocapitalize="off"></div>
+          <div class="field"><label>Med 5</label><input type="text" id="cfg-f-med-4" autocapitalize="off"></div>
+          <div class="field"><label>Med 6</label><input type="text" id="cfg-f-med-5" autocapitalize="off"></div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h4>Honeypot-Feld <span class="badge badge-warn">wichtig</span></h4>
+        <div class="section-hint">
+          Ein verstecktes Feld im Formular gegen Spam. Muss leer gesendet werden, sein Name muss aber stimmen.
+        </div>
+        <div class="field"><label>Name des Honeypot-Felds</label><input type="text" id="cfg-honeypot" autocapitalize="off"></div>
+      </div>
+      <div class="settings-group">
+        <h4>Zusätzliche Hidden-Felder</h4>
+        <div class="section-hint">
+          Falls das Formular weitere Hidden-Felder mit festen Werten hat (z.B. <code>form_id=10002336</code>, <code>submit=Senden</code>),
+          hier eintragen — Format: <code>name=wert</code>, eine pro Zeile.
+        </div>
+        <div class="field">
+          <textarea id="cfg-hidden" rows="4" autocapitalize="off"
+            style="font-family: 'SF Mono', Menlo, monospace; font-size: 14px;"></textarea>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="saveConfig()">Konfiguration speichern</button>
     </div>
-  </div>
-  <div class="settings-group">
-    <h4>Feldname-Zuordnung</h4>
-    <div class="mapping-grid">
-      <div class="field"><label>Datum</label><input type="text" id="cfg-f-datum" autocapitalize="off"></div>
-      <div class="field"><label>Vorname</label><input type="text" id="cfg-f-vorname" autocapitalize="off"></div>
-      <div class="field"><label>Nachname</label><input type="text" id="cfg-f-nachname" autocapitalize="off"></div>
-      <div class="field"><label>Geburtsdatum</label><input type="text" id="cfg-f-geburtsdatum" autocapitalize="off"></div>
-      <div class="field"><label>Straße</label><input type="text" id="cfg-f-strasse" autocapitalize="off"></div>
-      <div class="field"><label>PLZ</label><input type="text" id="cfg-f-plz" autocapitalize="off"></div>
-      <div class="field"><label>Ort</label><input type="text" id="cfg-f-ort" autocapitalize="off"></div>
-      <div class="field"><label>Telefon</label><input type="text" id="cfg-f-telefon" autocapitalize="off"></div>
-      <div class="field"><label>E-Mail</label><input type="text" id="cfg-f-email" autocapitalize="off"></div>
-    </div>
-  </div>
-  <div class="settings-group">
-    <h4>Medikament-Felder (1 bis 6)</h4>
-    <div class="mapping-grid">
-      <div class="field"><label>Med 1</label><input type="text" id="cfg-f-med-0" autocapitalize="off"></div>
-      <div class="field"><label>Med 2</label><input type="text" id="cfg-f-med-1" autocapitalize="off"></div>
-      <div class="field"><label>Med 3</label><input type="text" id="cfg-f-med-2" autocapitalize="off"></div>
-      <div class="field"><label>Med 4</label><input type="text" id="cfg-f-med-3" autocapitalize="off"></div>
-      <div class="field"><label>Med 5</label><input type="text" id="cfg-f-med-4" autocapitalize="off"></div>
-      <div class="field"><label>Med 6</label><input type="text" id="cfg-f-med-5" autocapitalize="off"></div>
-    </div>
-  </div>
-  <div class="settings-group">
-    <h4>Honeypot-Feld <span class="badge badge-warn">wichtig</span></h4>
-    <div class="section-hint">
-      Ein verstecktes Feld im Formular gegen Spam. Muss leer gesendet werden, sein Name muss aber stimmen.
-    </div>
-    <div class="field"><label>Name des Honeypot-Felds</label><input type="text" id="cfg-honeypot" autocapitalize="off"></div>
-  </div>
-  <div class="settings-group">
-    <h4>Zusätzliche Hidden-Felder</h4>
-    <div class="section-hint">
-      Falls das Formular weitere Hidden-Felder mit festen Werten hat (z.B. <code>form_id=10002336</code>, <code>submit=Senden</code>),
-      hier eintragen — Format: <code>name=wert</code>, eine pro Zeile.
-    </div>
-    <div class="field">
-      <textarea id="cfg-hidden" rows="4" autocapitalize="off"
-        style="font-family: 'SF Mono', Menlo, monospace; font-size: 14px;"></textarea>
-    </div>
-  </div>
-  <button class="btn btn-primary btn-block" onclick="saveConfig()">Konfiguration speichern</button>
-</div>
 
-<div class="section">
-  <h3>Hilfe: Feldnamen herausfinden</h3>
-  <div style="font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
-    <p>Einmal am PC nötig:</p>
-    <ol style="padding-left: 20px;">
-      <li>Praxis-Formular im Browser öffnen</li>
-      <li>F12 drücken (Entwicklertools), Reiter <strong>Netzwerk</strong></li>
-      <li>Formular einmal mit Test-Daten ausfüllen und absenden</li>
-      <li>Im Netzwerk-Reiter den POST-Request anklicken → <strong>Payload / Form-Data</strong></li>
-      <li>Alle Feldnamen ablesen und hier oben eintragen</li>
-    </ol>
-    <p>Alternativ: Rechtsklick auf das Formular → <em>Element untersuchen</em> → Attribut <code>name="..."</code> bei jedem Feld ablesen.</p>
-  </div>
-</div>
-```
-
+    <div class="section">
+      <h3>Hilfe: Feldnamen herausfinden</h3>
+      <div style="font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
+        <p>Einmal am PC nötig:</p>
+        <ol style="padding-left: 20px;">
+          <li>Praxis-Formular im Browser öffnen</li>
+          <li>F12 drücken (Entwicklertools), Reiter <strong>Netzwerk</strong></li>
+          <li>Formular einmal mit Test-Daten ausfüllen und absenden</li>
+          <li>Im Netzwerk-Reiter den POST-Request anklicken → <strong>Payload / Form-Data</strong></li>
+          <li>Alle Feldnamen ablesen und hier oben eintragen</li>
+        </ol>
+        <p>Alternativ: Rechtsklick auf das Formular → <em>Element untersuchen</em> → Attribut <code>name="..."</code> bei jedem Feld ablesen.</p>
+      </div>
+    </div>
   </div>
 
   <!-- ========== MODAL ========== -->
-
   <div class="modal-bg" id="modal-bg">
     <div class="modal">
       <h3 id="modal-title">Vorschau</h3>
@@ -506,7 +492,6 @@ font-family: “SF Mono”, “Menlo”, monospace;
   <div class="toast" id="toast"></div>
 
   <!-- Hidden form used for the actual POST -->
-
   <form id="submit-form" method="POST" target="_blank" style="display:none;"></form>
 
 </div>
@@ -706,6 +691,27 @@ function deletePerson() {
     toast("Gelöscht");
     goto("home");
   });
+}
+function duplicateAsTemplate() {
+  // Übernimmt die aktuell im Formular sichtbaren Stammdaten in eine NEUE Person
+  // mit leerem Medikamenten-Katalog. Die Ursprungsperson bleibt unverändert.
+  const newPerson = {
+    id: uid(),
+    displayName: "",
+    vorname: document.getElementById("ed-vorname").value.trim(),
+    nachname: document.getElementById("ed-nachname").value.trim(),
+    geburtsdatum: document.getElementById("ed-geburtsdatum").value,
+    strasse: document.getElementById("ed-strasse").value.trim(),
+    plz: document.getElementById("ed-plz").value.trim(),
+    ort: document.getElementById("ed-ort").value.trim(),
+    telefon: document.getElementById("ed-telefon").value.trim(),
+    email: document.getElementById("ed-email").value.trim(),
+    katalog: []
+  };
+  state.editingId = null;
+  setEditFields(newPerson);
+  toast("Stammdaten kopiert — bitte Anzeigename anpassen und speichern");
+  window.scrollTo(0, 0);
 }
 
 // ============================================================
@@ -1023,6 +1029,5 @@ function formatDateDE(iso) {
 loadState();
 renderHome();
 </script>
-
 </body>
 </html>
