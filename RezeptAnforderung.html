@@ -555,7 +555,7 @@
 // ============================================================
 // VERSION
 // ============================================================
-const APP_VERSION = "2.1.0";       // Sichtbar in der UI
+const APP_VERSION = "2.2.0";       // Sichtbar in der UI
 const CONFIG_VERSION = 3;          // bei Defaults-Änderung erhöhen
 
 // ============================================================
@@ -1153,8 +1153,8 @@ const USERSCRIPT_CODE = `// ==UserScript==
 // @namespace    rezept-app
 // @match        https://www.gesundheitszentrum-schondra.de/formulare/*
 // @run-at       document-end
-// @version      1.1
-// @description  Befüllt das Praxis-Formular automatisch wenn die URL einen #prefill=-Hash enthält. Robust gegen Cookie-Banner und AJAX-Reloads.
+// @version      1.2
+// @description  Befüllt das Praxis-Formular automatisch wenn die URL einen #prefill=-Hash enthält. Robust gegen Cookie-Banner via Polling.
 // ==/UserScript==
 
 (function() {
@@ -1172,11 +1172,15 @@ const USERSCRIPT_CODE = `// ==UserScript==
   }
 
   function showBanner(count) {
+    var existing = document.getElementById('rezept-fill-banner');
+    if (existing) existing.remove();
     var b = document.createElement('div');
+    b.id = 'rezept-fill-banner';
     b.textContent = '✓ ' + count + ' Felder vorausgefüllt — bitte prüfen und absenden';
     b.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#3a5f3f;color:#fff;padding:10px;text-align:center;font:14px -apple-system,sans-serif;z-index:99999;';
     document.body.appendChild(b);
     setTimeout(function() {
+      if (!b.parentNode) return;
       b.style.transition = 'opacity 0.5s';
       b.style.opacity = '0';
       setTimeout(function() { if (b.parentNode) b.remove(); }, 500);
@@ -1188,7 +1192,7 @@ const USERSCRIPT_CODE = `// ==UserScript==
     Object.keys(data).forEach(function(name) {
       document.querySelectorAll('[name="' + name + '"]').forEach(function(el) {
         if (el.type === 'hidden') return;
-        // Nur befüllen wenn Feld leer ist — schützt manuelle Korrekturen
+        // Nur leere Felder befüllen — manuelle Korrekturen werden nicht überschrieben
         if (el.value === '' || el.value == null) {
           el.value = data[name];
           el.dispatchEvent(new Event('input', {bubbles: true}));
@@ -1197,22 +1201,19 @@ const USERSCRIPT_CODE = `// ==UserScript==
         }
       });
     });
-    if (newlyFilled > 0) {
-      showBanner(newlyFilled);
-    }
+    if (newlyFilled > 0) showBanner(newlyFilled);
   }
 
-  // Initial befüllen
-  fillFields();
-
-  // DOM beobachten — bei Cookie-Akzeptanz oder AJAX-Reload erneut befüllen
-  var observer = new MutationObserver(function() {
+  // Polling: 30 Sekunden lang alle 500ms prüfen, ob (neue) leere Felder zu befüllen sind.
+  // Cookie-Akzeptanz-Reload wird so genauso erfasst wie der initiale Page-Load.
+  var attempts = 0;
+  function loop() {
     fillFields();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Nach 60 Sekunden aufhören zu beobachten
-  setTimeout(function() { observer.disconnect(); }, 60000);
+    if (++attempts < 60) {
+      setTimeout(loop, 500);
+    }
+  }
+  loop();
 })();`;
 
 function buildPrefillData() {
