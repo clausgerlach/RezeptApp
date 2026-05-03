@@ -545,7 +545,7 @@
 // ============================================================
 // VERSION
 // ============================================================
-const APP_VERSION = "1.8.0";       // Sichtbar in der UI
+const APP_VERSION = "1.9.0";       // Sichtbar in der UI
 const CONFIG_VERSION = 3;          // bei Defaults-Änderung erhöhen
 
 // ============================================================
@@ -1161,26 +1161,44 @@ function prefillRequest() {
   try {
     const json = JSON.stringify(data);
     const b64 = btoa(unescape(encodeURIComponent(json)));
-    const url = state.config.formAction + "#prefill=" + encodeURIComponent(b64);
-    const win = window.open(url, "_blank");
-    if (!win) {
-      toast("Pop-up wurde blockiert — bitte in Safari erlauben", true);
-      return;
-    }
+    const httpsUrl = state.config.formAction + "#prefill=" + encodeURIComponent(b64);
+
+    // x-safari-https: erzwingt Öffnen in echtem Safari statt In-App-Browser (SFSafariViewController).
+    // Nötig, wenn die App vom Homescreen-Icon (PWA-Modus) gestartet wurde —
+    // sonst würden die Bookmarklets nicht zur Verfügung stehen.
+    const safariUrl = httpsUrl.replace(/^https:/, "x-safari-https:");
+
+    // Echter Anker-Klick (statt window.open), damit iOS das URL-Schema sauber verarbeitet
+    const a = document.createElement("a");
+    a.href = safariUrl;
+    a.target = "_blank";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
     showModal("Formular geöffnet",
       '<p style="font-size:14px; line-height:1.6;">' +
-      'Im neuen Tab steht jetzt das Praxis-Formular mit leeren Feldern.</p>' +
+      'Safari wurde mit dem Praxis-Formular geöffnet.</p>' +
       '<ol style="font-size:14px; line-height:1.7; padding-left: 20px;">' +
-      '<li>Tippe oben in Safari auf das <strong>Lesezeichen-Symbol</strong> (Buch)</li>' +
-      '<li>Wähle <strong>"Rezept ausfüllen"</strong></li>' +
-      '<li>Die Felder werden befüllt</li>' +
-      '<li>Prüfen → <strong>"Anfordern"</strong> tippen</li>' +
+      '<li>In Safari unten auf das <strong>Lesezeichen-Symbol</strong> (Buch) tippen</li>' +
+      '<li><strong>"Rezept ausfüllen"</strong> wählen</li>' +
+      '<li>Felder werden befüllt → prüfen</li>' +
+      '<li><strong>"Anfordern"</strong> auf der Praxis-Seite tippen</li>' +
       '</ol>' +
       '<p style="font-size:13px; color: var(--ink-soft); margin-top:14px;">' +
-      'Bookmarklet noch nicht eingerichtet? <a href="#" onclick="closeModal();goto(\'settings\');return false;" style="color: var(--accent);">Anleitung in den Einstellungen</a></p>');
+      'Falls sich Safari nicht geöffnet hat: <a href="#" onclick="copyPrefillUrl(\'' + httpsUrl.replace(/'/g,"\\'") + '\');return false;" style="color: var(--accent);">URL kopieren</a> und manuell in Safari einfügen.</p>');
   } catch (e) {
     toast("Fehler beim Vorbereiten: " + e.message, true);
   }
+}
+
+function copyPrefillUrl(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    toast("URL kopiert — in Safari Adresszeile einfügen");
+  }).catch(() => {
+    toast("Kopieren fehlgeschlagen", true);
+  });
 }
 
 function showBookmarkletInfo() {
