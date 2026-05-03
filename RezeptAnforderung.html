@@ -545,7 +545,7 @@
 // ============================================================
 // VERSION
 // ============================================================
-const APP_VERSION = "1.7.0";       // Sichtbar in der UI
+const APP_VERSION = "1.8.0";       // Sichtbar in der UI
 const CONFIG_VERSION = 3;          // bei Defaults-Änderung erhöhen
 
 // ============================================================
@@ -650,6 +650,13 @@ function saveState() {
   }
 }
 function uid() { return Math.random().toString(36).slice(2, 10); }
+
+// Sortiert Medikamenten-Katalog alphabetisch (deutsche Locale: ä≈a, ö≈o, ü≈u)
+// und liefert eine NEUE Liste — Original bleibt unangetastet.
+const medCollator = new Intl.Collator('de', { sensitivity: 'base', numeric: true });
+function sortedKatalog(katalog) {
+  return [...(katalog || [])].sort((a, b) => medCollator.compare(a.name, b.name));
+}
 
 // ============================================================
 // NAVIGATION
@@ -767,7 +774,7 @@ function renderEditCatalog() {
     list.innerHTML = `<div style="font-size:13px; color: var(--ink-faint); padding: 8px 0;">Noch keine Medikamente im Katalog.</div>`;
     return;
   }
-  state.editingPerson.katalog.forEach((m, i) => {
+  sortedKatalog(state.editingPerson.katalog).forEach((m, i) => {
     const row = document.createElement("div");
     row.className = "med-row";
     row.innerHTML = `
@@ -982,7 +989,7 @@ function renderRequestMedList() {
       Noch keine Medikamente im Katalog. Person bearbeiten und welche anlegen.</div>`;
     return;
   }
-  p.katalog.forEach(m => {
+  sortedKatalog(p.katalog).forEach(m => {
     const row = document.createElement("div");
     row.className = "med-row" + (state.selectedMeds.includes(m.id) ? " selected" : "");
     row.innerHTML = `<div class="checkbox"></div><div class="med-name">${escapeHtml(m.name)}</div>`;
