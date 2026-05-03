@@ -432,6 +432,16 @@
     </div>
 
     <div class="section">
+      <h3>Userscript (vollautomatisch) <span class="badge">empfohlen</span></h3>
+      <div class="section-hint">
+        Mit der kostenlosen App "Userscripts" wird das Befüllen automatisch beim Seitenaufruf gemacht — kein Tap mehr nötig. Setup einmalig in 5 Minuten.
+      </div>
+      <button class="btn btn-secondary btn-block" onclick="showUserscriptInfo()">
+        Anleitung & Code anzeigen
+      </button>
+    </div>
+
+    <div class="section">
       <h3>Daten-Backup <span id="persist-status" class="badge">…</span></h3>
       <div class="section-hint">Da iOS die lokalen Daten gelegentlich löschen kann, regelmäßig sichern.</div>
       <div class="btn-row">
@@ -545,7 +555,7 @@
 // ============================================================
 // VERSION
 // ============================================================
-const APP_VERSION = "1.9.0";       // Sichtbar in der UI
+const APP_VERSION = "2.0.0";       // Sichtbar in der UI
 const CONFIG_VERSION = 3;          // bei Defaults-Änderung erhöhen
 
 // ============================================================
@@ -1138,6 +1148,44 @@ function submitRequest() {
 // ============================================================
 const BOOKMARKLET_CODE = "javascript:(function(){try{var h=location.hash||'';var m=h.match(/prefill=([^&]+)/);if(!m){alert('Keine Vorausfülldaten gefunden — bitte erst über die Rezept-App das Formular öffnen.');return;}var data=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));var filled=0;Object.keys(data).forEach(function(name){document.querySelectorAll('[name=\"'+name+'\"]').forEach(function(el){if(el.type==='hidden')return;el.value=data[name];el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));filled++;});});history.replaceState({},'',location.pathname+location.search);alert('Vorausgefüllt: '+filled+' Felder. Bitte prüfen und absenden.');}catch(e){alert('Fehler: '+e.message);}})();";
 
+const USERSCRIPT_CODE = `// ==UserScript==
+// @name         Rezept Vorausfüllen (Schondra)
+// @namespace    rezept-app
+// @match        https://www.gesundheitszentrum-schondra.de/formulare/*
+// @run-at       document-end
+// @version      1.0
+// @description  Befüllt das Praxis-Formular automatisch wenn die URL einen #prefill=-Hash enthält
+// ==/UserScript==
+
+(function() {
+  'use strict';
+  var h = location.hash || '';
+  var m = h.match(/prefill=([^&]+)/);
+  if (!m) return;
+  try {
+    var data = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
+    var filled = 0;
+    Object.keys(data).forEach(function(name) {
+      document.querySelectorAll('[name="' + name + '"]').forEach(function(el) {
+        if (el.type === 'hidden') return;
+        el.value = data[name];
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+        filled++;
+      });
+    });
+    history.replaceState({}, '', location.pathname + location.search);
+    // Dezenter visueller Hinweis oben
+    var b = document.createElement('div');
+    b.textContent = '✓ ' + filled + ' Felder vorausgefüllt — bitte prüfen und absenden';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#3a5f3f;color:#fff;padding:10px;text-align:center;font:14px -apple-system,sans-serif;z-index:99999;';
+    document.body.appendChild(b);
+    setTimeout(function() { b.style.transition = 'opacity 0.5s'; b.style.opacity = '0'; setTimeout(function() { b.remove(); }, 500); }, 4000);
+  } catch (e) {
+    console.error('Rezept-Userscript:', e);
+  }
+})();`;
+
 function buildPrefillData() {
   // Wie buildFormData, aber ohne Honeypot/Hidden-Felder — die werden auf
   // der Praxis-Seite vom Server selbst gesetzt und sollen nicht überschrieben werden
@@ -1226,6 +1274,38 @@ function copyBookmarkletCode(btn) {
     setTimeout(() => btn.textContent = "Code in Zwischenablage kopieren", 2500);
   }).catch(() => {
     toast("Kopieren fehlgeschlagen — manuell aus dem Vorschau-Feld unten kopieren", true);
+  });
+}
+
+function showUserscriptInfo() {
+  showModal("Userscript einrichten (vollautomatisch)",
+    '<p style="font-size:14px; line-height:1.6; margin-bottom:12px;">' +
+    'Statt jedes Mal das Lesezeichen anzutippen, kann eine Safari-Extension das Befüllen <strong>automatisch beim Seitenaufruf</strong> machen — null Klicks.' +
+    '</p>' +
+    '<p style="font-size:14px; font-weight:600; margin-bottom:6px;">Schritt-für-Schritt:</p>' +
+    '<ol style="font-size:13px; line-height:1.7; padding-left: 20px; margin-bottom:14px;">' +
+    '<li>Im App Store nach <strong>"Userscripts" von quoid</strong> suchen und installieren (kostenlos)</li>' +
+    '<li>iOS-<strong>Einstellungen → Apps → Safari → Erweiterungen → Userscripts</strong> aktivieren</li>' +
+    '<li>Bei „Berechtigungen" → unter „Auf allen Webseiten erlauben" → <strong>„Erlauben"</strong> tippen</li>' +
+    '<li>Safari öffnen → die Praxis-URL aufrufen</li>' +
+    '<li>In der Adressleiste links auf <strong>„AA"</strong> tippen → <strong>„Userscripts"</strong> wählen</li>' +
+    '<li>Im Popup auf <strong>„+"</strong> tippen → <strong>„New JS"</strong> wählen</li>' +
+    '<li>Vorgegebenen Inhalt komplett löschen, den Code unten einfügen, oben rechts <strong>„Save"</strong></li>' +
+    '</ol>' +
+    '<button class="btn btn-primary btn-block" onclick="copyUserscriptCode(this)">Userscript-Code kopieren</button>' +
+    '<p style="font-size:11px; color: var(--ink-soft); margin: 14px 0 4px;">Vorschau:</p>' +
+    '<pre style="max-height:140px; overflow:auto; font-size:10px;">' + escapeHtml(USERSCRIPT_CODE) + '</pre>' +
+    '<p style="font-size:13px; color: var(--ink-soft); margin-top: 12px;">' +
+    'Danach: Aus der App auf <em>„Formular vorausfüllen"</em> tippen — Safari öffnet sich, das Formular ist sofort befüllt, du musst nur noch prüfen und absenden.' +
+    '</p>');
+}
+
+function copyUserscriptCode(btn) {
+  navigator.clipboard.writeText(USERSCRIPT_CODE).then(() => {
+    btn.textContent = "✓ Kopiert!";
+    setTimeout(() => btn.textContent = "Userscript-Code kopieren", 2500);
+  }).catch(() => {
+    toast("Kopieren fehlgeschlagen — manuell aus dem Vorschau-Feld kopieren", true);
   });
 }
 
